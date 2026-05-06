@@ -7,9 +7,11 @@ from pathlib import Path
 import typer
 from rich.console import Console
 
+from app.core.application_tracker import render_tracker_summary
 from app.core.evidence_matcher import map_evidence
 from app.core.fit_scorer import score_job
 from app.core.generators import write_application_pack
+from app.core.github_portfolio import write_portfolio_summary
 from app.core.jd_parser import parse_job_file
 from app.core.profile_loader import load_profile, load_projects, load_rules
 
@@ -46,6 +48,26 @@ def score_job_command(job_file: Path, profile: Path = DEFAULT_PROFILE, portfolio
     projects = load_projects(portfolio)
     fit = score_job(job, candidate, projects)
     console.print_json(json.dumps(fit.model_dump(), indent=2))
+
+
+@app.command(name="ingest-github-repo")
+def ingest_github_repo(
+    repo_name: str,
+    file_list: Path = typer.Argument(..., help="Text file containing one repo path per line."),
+    readme: Path | None = typer.Option(None, help="Optional README text file."),
+    output: Path = typer.Option(Path("profile/github_portfolio.generated.yaml")),
+) -> None:
+    """Convert a GitHub repo file listing into portfolio evidence YAML."""
+    paths = [line.strip() for line in file_list.read_text(encoding="utf-8").splitlines() if line.strip()]
+    readme_text = readme.read_text(encoding="utf-8") if readme else ""
+    write_portfolio_summary(repo_name, paths, output, readme_text)
+    console.print(f"[bold green]GitHub portfolio summary written:[/bold green] {output}")
+
+
+@app.command(name="tracker-summary")
+def tracker_summary(tracker: Path = typer.Option(Path("outputs/applications/application_tracker.csv"))) -> None:
+    """Render a Markdown summary of prepared application packs."""
+    console.print(render_tracker_summary(tracker))
 
 
 @app.command()
@@ -86,6 +108,8 @@ def validate_pack(pack_dir: Path) -> None:
         "09_recruiter_message.md",
         "10_application_notes.md",
         "11_truthfulness_report.md",
+        "12_missing_skills_report.md",
+        "13_resume_diff.md",
     ]
     missing = [name for name in required if not (pack_dir / name).exists()]
     if missing:

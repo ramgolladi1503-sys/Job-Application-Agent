@@ -1,0 +1,66 @@
+candidate:
+  name: Ram Golladi
+  headline: QA Automation / SDET candidate with full-stack exposure and AI testing project experience
+  email: ram@example.com
+  location: India
+  target_roles:
+    - QA Automation Engineer
+    - SDET
+    - GenAI QA Engineer
+    - AI Testing Engineer
+    - Full Stack QA Engineer
+
+summary:
+  default: >
+    QA-focused engineer with experience across manual testing, automation testing,
+    API validation, regression testing, financial workflow validation, and full-stack
+    engineering exposure.
+  sdet_fullstack: >
+    QA Automation / SDET profile with full-stack exposure across .NET Core, React,
+    Docker, CI/CD validation, API testing, and financial workflow testing.
+  genai_qa: >
+    AI Testing / GenAI QA profile focused on MCP Shield, LLM behavior validation,
+    hallucination risk testing, prompt testing, policy controls, and automation-backed
+    test strategy.
+
+skills:
+  testing:
+    - Manual Testing
+    - Functional Testing
+    - Regression Testing
+    - API Testing
+    - Automation Testing
+    - Test Strategy
+    - Defect Analysis
+  automation:
+    - Selenium
+    - Appium
+    - Playwright
+    - Pytest
+    - CI/CD validation
+  development:
+    - .NET Core
+    - React
+    - MVC
+    - Python
+    - Docker
+    - Kubernetes
+    - GitHub Actions
+  ai_testing:
+    - LLM Evaluation
+    - Hallucination Testing
+    - Model Validation
+    - Prompt Testing
+    - Risk Controls
+    - MCP Security Testing
+
+experience:
+  - title: QA / Automation Engineer
+    company: Portfolio and professional projects
+    start: 2021
+    end: Present
+    bullets:
+      - Designed and executed functional, regression, API, and automation-focused test workflows.
+      - Validated complex financial workflows involving data consistency, execution readiness, and runtime reliability.
+      - Worked with Dockerized environments and CI/CD-style validation workflows to improve repeatability.
+      - Built test strategies for AI and automation-heavy systems with strong focus on risk controls and quality gates.

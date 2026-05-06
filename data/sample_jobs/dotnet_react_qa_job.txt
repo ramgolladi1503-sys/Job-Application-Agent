@@ -1,0 +1,26 @@
+Company: Example FinTech Solutions
+Role: QA Engineer - .NET + React
+Location: Hyderabad / Hybrid
+Seniority: Mid-Level
+
+Need a QA engineer with functional testing, regression testing, API testing, Selenium, and CI/CD validation.
+
+Must have:
+- Selenium or Playwright
+- API testing
+- .NET Core exposure
+- React exposure
+- Test strategy
+
+Good to have:
+- Docker
+- Kubernetes
+- GitHub Actions
+- Financial services or trading domain experience
+- MVC application testing
+
+Responsibilities:
+- Create and maintain test suites
+- Validate frontend and backend workflows
+- Execute regression testing before releases
+- Support CI/CD quality gates

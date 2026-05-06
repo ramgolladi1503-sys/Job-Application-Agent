@@ -1,0 +1,28 @@
+Company: Example AI Labs
+Role: GenAI QA Engineer
+Location: Remote
+Seniority: Mid-Level
+
+Need a GenAI QA engineer to validate LLM workflows, prompt behavior, model responses, tool usage, and safety controls.
+
+Must have:
+- QA testing experience
+- AI testing or GenAI testing exposure
+- LLM evaluation understanding
+- Prompt testing
+- Model response validation
+- Test strategy and risk analysis
+
+Good to have:
+- MCP or agent tool-use validation
+- Hallucination testing
+- Policy controls
+- Python automation
+- Security testing mindset
+
+Responsibilities:
+- Design test strategies for AI products
+- Validate hallucination risks and unsafe responses
+- Test model behavior across prompts and workflows
+- Build repeatable validation checks
+- Document risks and quality gates

@@ -1,0 +1,79 @@
+projects:
+  - name: Tradebot
+    type: Financial automation / trading system
+    role: Builder and QA-focused validator
+    tech_stack:
+      - Python
+      - Docker
+      - CI/CD validation
+      - Pytest
+      - Market data workflows
+    relevant_for:
+      - QA Automation
+      - SDET
+      - FinTech QA
+      - CI/CD Testing
+      - API Testing
+    evidence:
+      - Dockerized runtime structure
+      - Automated validation workflows
+      - Trading workflow testing
+      - Regression testing
+      - Risk and execution validation
+      - Stale-feed detection scenarios
+      - Contract validation checks
+    safe_resume_bullets:
+      - Built and validated automated workflows for financial trading scenarios covering order validation, execution checks, and runtime reliability.
+      - Designed testing coverage for trading workflow risks including stale market data, contract resolution, execution readiness, and regression failures.
+      - Used Dockerized runtime patterns and CI/CD-style checks to improve repeatability of validation workflows.
+
+  - name: MCP Shield
+    type: AI security / GenAI testing project
+    role: Product owner and QA/AI safety designer
+    tech_stack:
+      - Python
+      - MCP
+      - LLM testing
+      - Policy validation
+      - Risk scoring
+    relevant_for:
+      - GenAI QA
+      - AI Testing
+      - LLM Validation
+      - AI Safety
+      - Security Testing
+    evidence:
+      - Tool-use validation
+      - Policy enforcement design
+      - Hallucination risk controls
+      - Agent safety gates
+      - Model behavior validation
+      - Production-safe AI workflow design
+    safe_resume_bullets:
+      - Designed MCP Shield as an AI tool-use security and validation gateway focused on risk scoring, policy enforcement, and production-safe agent behavior.
+      - Created AI testing strategies covering hallucination risks, model response validation, prompt behavior checks, and policy-based tool-use controls.
+      - Defined validation gates for agentic AI workflows to reduce unsafe actions, unsupported outputs, and production risk.
+
+  - name: Automation Frameworks
+    type: QA automation portfolio
+    role: QA automation engineer
+    tech_stack:
+      - Selenium
+      - Appium
+      - Playwright
+      - API testing
+      - Pytest
+    relevant_for:
+      - QA Automation
+      - SDET
+      - Regression Testing
+      - API Testing
+    evidence:
+      - Functional automation
+      - Regression automation
+      - API validation
+      - Test case design
+      - Defect reporting
+    safe_resume_bullets:
+      - Built and maintained automation-focused validation workflows across functional, regression, API, and system-level testing scenarios.
+      - Created reusable test cases and validation checks to improve defect detection and release confidence.

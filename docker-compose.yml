@@ -1,0 +1,8 @@
+services:
+  portfoliofit:
+    build: .
+    volumes:
+      - ./outputs:/app/outputs
+      - ./profile:/app/profile
+      - ./data:/app/data
+    command: ["generate-pack", "data/sample_jobs/genai_qa_job.txt", "--output", "outputs/applications/genai_qa_demo"]

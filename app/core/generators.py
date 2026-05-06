@@ -9,6 +9,9 @@ from jinja2 import Environment, FileSystemLoader
 from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
 
+from app.core.application_tracker import append_application_record
+from app.core.missing_skills import analyze_missing_skills, render_missing_skills_report
+from app.core.resume_diff import create_resume_diff
 from app.models import CandidateProfile, EvidenceMatch, FitScore, JobDescription, Project, ResumeRules
 from app.validators.truthfulness_validator import render_truthfulness_report, validate_claims
 
@@ -19,6 +22,19 @@ def render_resume(job: JobDescription, profile: CandidateProfile, projects: list
     template_name = "resumes/genai_qa_resume.md.j2" if "AI Testing" in fit.best_positioning else "resumes/sdet_fullstack_resume.md.j2"
     env = Environment(loader=FileSystemLoader(TEMPLATE_DIR), autoescape=False)
     return env.get_template(template_name).render(job=job, profile=profile, projects=projects, fit_score=fit, evidence_matches=[e for e in evidence if e.evidence_strength != "Missing"])
+
+
+def render_base_resume(profile: CandidateProfile, projects: list[Project]) -> str:
+    lines = [f"# {profile.candidate.get('name', 'Candidate Name')}", "", profile.candidate.get("headline", "QA Candidate"), "", "## Professional Summary", "", profile.summary.get("default", ""), "", "## Skills", ""]
+    for group, skills in profile.skills.items():
+        lines.append(f"- {group}: {', '.join(skills)}")
+    lines += ["", "## Projects", ""]
+    for project in projects:
+        lines += [f"### {project.name}", project.type, ""]
+        for bullet in project.safe_resume_bullets[:1]:
+            lines.append(f"- {bullet}")
+        lines.append("")
+    return "\n".join(lines)
 
 
 def render_cover_letter(job: JobDescription, profile: CandidateProfile, fit: FitScore, evidence: list[EvidenceMatch]) -> str:
@@ -81,8 +97,11 @@ def write_pdf(markdown_text: str, output_path: Path) -> None:
 
 
 def write_application_pack(output_dir: str | Path, job: JobDescription, profile: CandidateProfile, projects: list[Project], rules: ResumeRules, fit: FitScore, evidence: list[EvidenceMatch]) -> list[str]:
-    out = Path(output_dir); out.mkdir(parents=True, exist_ok=True)
+    out = Path(output_dir)
+    out.mkdir(parents=True, exist_ok=True)
+    base_resume = render_base_resume(profile, projects)
     resume = render_resume(job, profile, projects, fit, evidence)
+    missing_report = render_missing_skills_report(analyze_missing_skills(job, profile, projects))
     files = {
         "01_raw_job_description.txt": job.raw_text,
         "02_parsed_job_description.json": json.dumps(job.model_dump(), indent=2),
@@ -93,13 +112,18 @@ def write_application_pack(output_dir: str | Path, job: JobDescription, profile:
         "09_recruiter_message.md": render_recruiter_message(job, fit),
         "10_application_notes.md": render_notes(job, fit),
         "11_truthfulness_report.md": render_truthfulness_report(validate_claims(resume, evidence, rules)),
+        "12_missing_skills_report.md": missing_report,
+        "13_resume_diff.md": create_resume_diff(base_resume, resume),
     }
     written = []
     for name, content in files.items():
-        path = out / name; path.write_text(content, encoding="utf-8"); written.append(str(path))
+        path = out / name
+        path.write_text(content, encoding="utf-8")
+        written.append(str(path))
     write_docx(resume, out / "06_tailored_resume.docx")
     write_pdf(resume, out / "07_tailored_resume.pdf")
     written += [str(out / "06_tailored_resume.docx"), str(out / "07_tailored_resume.pdf")]
+    append_application_record(out.parent / "application_tracker.csv", job, fit, out)
     return written
 
 

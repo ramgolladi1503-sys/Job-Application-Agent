@@ -7,10 +7,10 @@ from app.models import JobDescription
 
 KNOWN_SKILLS = [
     ".NET Core", "React", "MVC", "Docker", "Kubernetes", "GitHub Actions", "Azure DevOps", "CI/CD",
-    "Selenium", "Playwright", "Appium", "Pytest", "API Testing", "Regression Testing",
-    "Functional Testing", "Manual Testing", "Automation Testing", "Python", "GenAI", "AI Testing",
+    "Selenium", "Playwright", "Cypress", "Appium", "Pytest", "API Testing", "Regression Testing",
+    "Functional Testing", "Manual Testing", "Automation Testing", "QA Testing", "Python", "GenAI", "AI Testing",
     "LLM Evaluation", "LLM", "Prompt Testing", "Model Validation", "Hallucination Testing", "MCP",
-    "Security Testing", "Risk Analysis", "Test Strategy",
+    "Security Testing", "Risk Analysis", "Test Strategy", "Research Publications", "Distributed Training",
 ]
 
 DOMAIN_KEYWORDS = {

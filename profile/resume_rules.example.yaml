@@ -1,0 +1,22 @@
+rules:
+  forbidden_claims:
+    - Owned production Kubernetes infrastructure
+    - Senior ML researcher
+    - Expert in advanced machine learning model training
+    - Built institutional-grade trading infrastructure
+    - Guaranteed profitable trading system
+
+  caution_terms:
+    expert: Use only when supported by strong evidence.
+    production: Use carefully; prefer production-safe design or deployment validation when ownership is not proven.
+    Kubernetes: Prefer exposure or environment validation unless direct ownership exists.
+
+  approval_gate:
+    require_manual_review: true
+    auto_apply_allowed: false
+
+  ats:
+    use_tables: false
+    use_photos: false
+    use_icons: false
+    max_pages: 2

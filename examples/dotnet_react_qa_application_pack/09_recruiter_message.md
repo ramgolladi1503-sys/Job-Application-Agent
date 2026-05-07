@@ -1,0 +1,1 @@
+Hi [Name], I saw the QA Engineer - .NET + React role at Example FinTech Solutions. My strongest angle is QA Automation / SDET with full-stack exposure, API testing, Docker/CI validation, and financial workflow testing through Tradebot. I have a tailored resume and evidence map ready for review and would be glad to discuss fit.

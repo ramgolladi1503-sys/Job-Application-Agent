@@ -4,8 +4,8 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "portfoliofit-agent"
-version = "0.1.0"
-description = "Evidence-based job application preparation agent with fit scoring, evidence mapping, and tailored application packs."
+version = "0.2.0"
+description = "Evidence-based job application preparation agent with fit scoring, evidence mapping, ATS scoring, APIs, dashboard, and tailored application packs."
 readme = "README.md"
 requires-python = ">=3.10"
 license = {text = "MIT"}
@@ -17,7 +17,10 @@ dependencies = [
   "Jinja2>=3.1.0",
   "python-docx>=1.1.0",
   "reportlab>=4.0.0",
-  "rich>=13.7.0"
+  "rich>=13.7.0",
+  "fastapi>=0.111.0",
+  "uvicorn>=0.30.0",
+  "streamlit>=1.36.0"
 ]
 
 [project.optional-dependencies]
@@ -25,7 +28,8 @@ dev = [
   "pytest>=8.0.0",
   "ruff>=0.4.0",
   "mypy>=1.9.0",
-  "types-PyYAML>=6.0.12"
+  "types-PyYAML>=6.0.12",
+  "httpx>=0.27.0"
 ]
 
 [project.scripts]

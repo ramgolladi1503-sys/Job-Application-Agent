@@ -87,7 +87,7 @@ def write_portfolio_summary(repo_name: str, file_paths: list[str], output_path: 
     summary = {"projects": [summarize_repo_tree(repo_name, file_paths, readme_text)]}
     path = Path(output_path)
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(yaml.safe_dump(summary, sort_keys=False), encoding="utf-8"), encoding="utf-8")
+    path.write_text(yaml.safe_dump(summary, sort_keys=False), encoding="utf-8")
 
 
 def write_local_repo_summary(repo_path: str | Path, output_path: str | Path) -> None:

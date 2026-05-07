@@ -92,7 +92,8 @@ def write_pdf(markdown_text: str, output_path: Path) -> None:
             pdf.drawString(50, y, line)
         y -= 14
         if y < 50:
-            pdf.showPage(); y = height - 50
+            pdf.showPage()
+            y = height - 50
     pdf.save()
 
 

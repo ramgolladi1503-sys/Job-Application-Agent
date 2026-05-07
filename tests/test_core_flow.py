@@ -1,12 +1,14 @@
 from pathlib import Path
 
+from app.core.application_tracker import append_application_record, export_tracker, read_tracker, update_application_status
 from app.core.evidence_matcher import map_evidence
 from app.core.fit_scorer import score_job
 from app.core.generators import write_application_pack
-from app.core.github_portfolio import summarize_repo_tree
+from app.core.github_portfolio import scan_local_repo, summarize_repo_tree
 from app.core.missing_skills import analyze_missing_skills
 from app.core.profile_loader import load_profile, load_projects, load_rules
 from app.core.jd_parser import parse_job_description, parse_job_file
+from app.core.resume_ingestion import ingest_resume_text
 from app.validators.truthfulness_validator import validate_claims
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -84,6 +86,56 @@ def test_github_repo_ingestion_detects_project_evidence():
     assert "GitHub Actions" in summary["tech_stack"]
     assert "AI Testing" in summary["tech_stack"]
     assert "GenAI QA" in summary["relevant_for"]
+
+
+def test_local_repo_scan_ignores_noise_and_reads_readme(tmp_path):
+    repo = tmp_path / "sample_repo"
+    (repo / "app").mkdir(parents=True)
+    (repo / "tests").mkdir()
+    (repo / ".git").mkdir()
+    (repo / "README.md").write_text("MCP LLM prompt validation", encoding="utf-8")
+    (repo / "app/main.py").write_text("print('hello')", encoding="utf-8")
+    (repo / "tests/test_main.py").write_text("def test_ok(): assert True", encoding="utf-8")
+    (repo / ".git/config").write_text("ignored", encoding="utf-8")
+    repo_name, paths, readme = scan_local_repo(repo)
+    assert repo_name == "sample_repo"
+    assert "app/main.py" in paths
+    assert ".git/config" not in paths
+    assert "MCP" in readme
+
+
+def test_resume_ingestion_builds_profile_yaml_shape():
+    profile = ingest_resume_text(
+        """
+        Professional Summary
+        QA Automation Engineer with Selenium, API Testing, React, .NET Core, Docker, GenAI, LLM Evaluation, and Prompt Testing experience.
+
+        Experience
+        - Designed automation tests for API and regression workflows across release cycles.
+        - Validated LLM prompt behavior and model response risks for AI workflows.
+        """,
+        candidate_name="Ram Golladi",
+    )
+    assert profile["candidate"]["name"] == "Ram Golladi"
+    assert "GenAI QA Engineer" in profile["candidate"]["target_roles"]
+    assert "automation" in profile["skills"]
+    assert "ai_testing" in profile["skills"]
+
+
+def test_application_tracker_update_and_export(tmp_path):
+    tracker = tmp_path / "tracker.csv"
+    exported = tmp_path / "exports/tracker_copy.csv"
+    job = parse_job_file(ROOT / "data/sample_jobs/dotnet_react_qa_job.txt")
+    profile = load_profile(ROOT / "profile/master_profile.example.yaml")
+    projects = load_projects(ROOT / "profile/project_portfolio.example.yaml")
+    fit = score_job(job, profile, projects)
+    append_application_record(tracker, job, fit, tmp_path / "pack")
+    updated = update_application_status(tracker, "Example FinTech", ".NET + React", "submitted", "2026-05-14", "Submitted manually")
+    rows = read_tracker(tracker)
+    export_tracker(tracker, exported)
+    assert updated == 1
+    assert rows[0]["status"] == "submitted"
+    assert exported.exists()
 
 
 def test_unsupported_kubernetes_claim_is_flagged():

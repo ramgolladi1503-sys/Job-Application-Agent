@@ -1,10 +1,12 @@
 from pathlib import Path
 
 from app.core.application_tracker import append_application_record, export_tracker, read_tracker, update_application_status
+from app.core.ats_scorer import score_resume_ats
 from app.core.evidence_matcher import map_evidence
 from app.core.fit_scorer import score_job
-from app.core.generators import write_application_pack
+from app.core.generators import render_resume, write_application_pack
 from app.core.github_portfolio import scan_local_repo, summarize_repo_tree, write_portfolio_summary
+from app.core.interview_prep import generate_interview_prep
 from app.core.missing_skills import analyze_missing_skills
 from app.core.profile_loader import load_profile, load_projects, load_rules
 from app.core.jd_parser import parse_job_description, parse_job_file
@@ -26,9 +28,11 @@ def test_genai_qa_job_highlights_mcp_shield(tmp_path):
     assert fit.final_score >= 70
     assert "MCP Shield" in resume
     assert "hallucination" in resume.lower()
-    assert len(files) == 13
+    assert len(files) == 15
     assert (tmp_path / "pack/12_missing_skills_report.md").exists()
     assert (tmp_path / "pack/13_resume_diff.md").exists()
+    assert (tmp_path / "pack/14_ats_score_report.md").exists()
+    assert (tmp_path / "pack/15_interview_prep.md").exists()
     assert (tmp_path / "application_tracker.csv").exists()
 
 
@@ -57,6 +61,21 @@ def test_low_fit_job_scores_lower_than_target_jobs():
     profile = load_profile(ROOT / "profile/master_profile.example.yaml")
     projects = load_projects(ROOT / "profile/project_portfolio.example.yaml")
     assert score_job(low_fit, profile, projects).final_score < score_job(target, profile, projects).final_score
+
+
+def test_ats_scoring_and_interview_prep_outputs():
+    job = parse_job_file(ROOT / "data/sample_jobs/genai_qa_job.txt")
+    profile = load_profile(ROOT / "profile/master_profile.example.yaml")
+    projects = load_projects(ROOT / "profile/project_portfolio.example.yaml")
+    fit = score_job(job, profile, projects)
+    evidence = map_evidence(job, profile, projects)
+    resume = render_resume(job, profile, projects, fit, evidence)
+    ats = score_resume_ats(resume, job, evidence)
+    prep = generate_interview_prep(job, fit, evidence)
+    assert ats["final_score"] > 0
+    assert "matched_keywords" in ats
+    assert prep["likely_questions"]
+    assert "MCP" in " ".join(prep["elevator_pitch"].split()) or "AI" in prep["positioning"]
 
 
 def test_missing_skills_report_identifies_gaps():
@@ -171,4 +190,6 @@ def test_pack_contains_manual_approval_boundary(tmp_path):
     write_application_pack(tmp_path / "pack", job, profile, projects, rules, fit, evidence)
     notes = (tmp_path / "pack/10_application_notes.md").read_text(encoding="utf-8")
     assert "Manual Approval Checklist" in notes
+    assert "ATS report reviewed" in notes
+    assert "Interview prep reviewed" in notes
     assert "No auto-apply action has been taken" in notes

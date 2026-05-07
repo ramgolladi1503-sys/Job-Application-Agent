@@ -1,9 +1,11 @@
 from __future__ import annotations
 
 import json
+import os
 import re
 import urllib.request
 from pathlib import Path
+from typing import Any
 
 import yaml
 
@@ -19,28 +21,24 @@ TECH_HINTS = {
     "CI/CD": ["ci.yml", "pipeline", "github actions", "azure-pipelines"],
 }
 
-IGNORED_DIRS = {".git", ".venv", "venv", "node_modules", "__pycache__", ".pytest_cache", ".mypy_cache", "dist", "build"}
+IGNORED_DIRS = {
+    ".git",
+    ".venv",
+    "venv",
+    "node_modules",
+    "__pycache__",
+    ".pytest_cache",
+    ".mypy_cache",
+    "dist",
+    "build",
+}
 
 
-def summarize_repo_tree(repo_name: str, file_paths: list[str], readme_text: str = "") -> dict[str, object]:
-    text = "\n".join(file_paths + [readme_text]).lower()
-    tech_stack = []
-    evidence = []
-    for tech, hints in TECH_HINTS.items():
-        if any(hint.lower() in text for hint in hints):
-            tech_stack.append(tech)
-    if any(path.startswith("tests/") or "/tests/" in path for path in file_paths):
-        evidence.append("Repository includes automated test structure.")
-    if any(".github/workflows" in path for path in file_paths):
-        evidence.append("Repository includes GitHub Actions workflow configuration.")
-    if any("docker" in path.lower() for path in file_paths):
-        evidence.append("Repository includes Docker-related configuration.")
-    if any(path.lower().endswith(("requirements.txt", "pyproject.toml", "package.json")) for path in file_paths):
-        evidence.append("Repository includes dependency/package configuration.")
-    if re.search(r"\b(mcp|llm|genai|prompt|hallucination)\b", text):
-        evidence.append("Repository contains AI or GenAI validation-related signals.")
-    if not evidence:
-        evidence.append("Repository evidence should be reviewed manually before using in resume claims.")
+def summarize_repo_tree(repo_name: str, file_paths: list[str], readme_text: str = "") -> dict[str, Any]:
+    normalized_paths = sorted(_unique(path.strip() for path in file_paths if path.strip()))
+    text = "\n".join(normalized_paths + [readme_text]).lower()
+    tech_stack = _detect_tech_stack(text)
+    evidence = _detect_evidence(normalized_paths, text)
     return {
         "name": repo_name,
         "type": "GitHub repository summary",
@@ -48,9 +46,12 @@ def summarize_repo_tree(repo_name: str, file_paths: list[str], readme_text: str 
         "tech_stack": tech_stack,
         "relevant_for": _relevant_for(tech_stack, text),
         "evidence": evidence,
-        "safe_resume_bullets": [
-            f"Maintained {repo_name} with evidence of {', '.join(tech_stack[:4]) or 'software project structure'} and reviewable project artifacts."
-        ],
+        "safe_resume_bullets": [_safe_bullet(repo_name, tech_stack, evidence)],
+        "metadata": {
+            "source": "github_repo_scan",
+            "file_count": len(normalized_paths),
+            "has_readme": bool(readme_text.strip()),
+        },
     }
 
 
@@ -87,7 +88,7 @@ def write_portfolio_summary(repo_name: str, file_paths: list[str], output_path: 
     summary = {"projects": [summarize_repo_tree(repo_name, file_paths, readme_text)]}
     path = Path(output_path)
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(yaml.safe_dump(summary, sort_keys=False), encoding="utf-8")
+    path.write_text(yaml.safe_dump(summary, sort_keys=False, allow_unicode=True), encoding="utf-8")
 
 
 def write_local_repo_summary(repo_path: str | Path, output_path: str | Path) -> None:
@@ -100,8 +101,8 @@ def write_remote_repo_summary(owner: str, repo: str, output_path: str | Path, re
     write_portfolio_summary(repo_name, paths, output_path, readme_text)
 
 
-def _fetch_json(url: str) -> dict[str, object]:
-    request = urllib.request.Request(url, headers={"Accept": "application/vnd.github+json", "User-Agent": "portfoliofit-agent"})
+def _fetch_json(url: str) -> dict[str, Any]:
+    request = urllib.request.Request(url, headers=_github_headers())
     with urllib.request.urlopen(request, timeout=20) as response:
         return json.loads(response.read().decode("utf-8"))
 
@@ -118,12 +119,45 @@ def _fetch_readme(owner: str, repo: str, ref: str) -> str:
     return ""
 
 
+def _github_headers() -> dict[str, str]:
+    headers = {"Accept": "application/vnd.github+json", "User-Agent": "portfoliofit-agent"}
+    token = os.getenv("GITHUB_TOKEN")
+    if token:
+        headers["Authorization"] = f"Bearer {token}"
+    return headers
+
+
 def _read_first_existing(root: Path, names: list[str]) -> str:
     for name in names:
         path = root / name
         if path.exists():
             return path.read_text(encoding="utf-8", errors="replace")
     return ""
+
+
+def _detect_tech_stack(text: str) -> list[str]:
+    return [tech for tech, hints in TECH_HINTS.items() if any(hint.lower() in text for hint in hints)]
+
+
+def _detect_evidence(file_paths: list[str], text: str) -> list[str]:
+    evidence = []
+    if any(path.startswith("tests/") or "/tests/" in path for path in file_paths):
+        evidence.append("Repository includes automated test structure.")
+    if any(".github/workflows" in path for path in file_paths):
+        evidence.append("Repository includes GitHub Actions workflow configuration.")
+    if any("docker" in path.lower() for path in file_paths):
+        evidence.append("Repository includes Docker-related configuration.")
+    if any(path.lower().endswith(("requirements.txt", "pyproject.toml", "package.json")) for path in file_paths):
+        evidence.append("Repository includes dependency/package configuration.")
+    if re.search(r"\b(mcp|llm|genai|prompt|hallucination)\b", text):
+        evidence.append("Repository contains AI or GenAI validation-related signals.")
+    return evidence or ["Repository evidence should be reviewed manually before using in resume claims."]
+
+
+def _safe_bullet(repo_name: str, tech_stack: list[str], evidence: list[str]) -> str:
+    tech_text = ", ".join(tech_stack[:4]) or "software project structure"
+    evidence_text = evidence[0].replace("Repository includes ", "includes ").replace("Repository contains ", "contains ")
+    return f"Maintained {repo_name} with evidence of {tech_text}; {evidence_text.lower()}"
 
 
 def _relevant_for(tech_stack: list[str], text: str) -> list[str]:
@@ -136,4 +170,17 @@ def _relevant_for(tech_stack: list[str], text: str) -> list[str]:
         roles.append("Full Stack QA")
     if "Docker" in tech_stack or "GitHub Actions" in tech_stack or "CI/CD" in tech_stack:
         roles.append("CI/CD Testing")
-    return roles or ["Software Portfolio"]
+    return _unique(roles) or ["Software Portfolio"]
+
+
+def _unique(items: list[str] | object) -> list[str]:
+    seen: set[str] = set()
+    result: list[str] = []
+    for item in items:
+        if not isinstance(item, str):
+            continue
+        key = item.lower()
+        if key not in seen:
+            result.append(item)
+            seen.add(key)
+    return result

@@ -8,10 +8,12 @@ import typer
 from rich.console import Console
 
 from app.core.application_tracker import export_tracker, render_tracker_summary, update_application_status
+from app.core.ats_scorer import render_ats_report, score_resume_ats
 from app.core.evidence_matcher import map_evidence
 from app.core.fit_scorer import score_job
-from app.core.generators import write_application_pack
+from app.core.generators import render_resume, write_application_pack
 from app.core.github_portfolio import write_local_repo_summary, write_portfolio_summary, write_remote_repo_summary
+from app.core.interview_prep import generate_interview_prep, render_interview_prep
 from app.core.jd_parser import parse_job_file
 from app.core.profile_loader import load_profile, load_projects, load_rules
 from app.core.resume_ingestion import ingest_resume_file
@@ -64,6 +66,29 @@ def score_job_command(job_file: Path, profile: Path = DEFAULT_PROFILE, portfolio
     console.print_json(json.dumps(fit.model_dump(), indent=2))
 
 
+@app.command(name="ats-score")
+def ats_score_command(job_file: Path, profile: Path = DEFAULT_PROFILE, portfolio: Path = DEFAULT_PORTFOLIO) -> None:
+    """Generate an ATS score report for the tailored resume preview."""
+    job = parse_job_file(job_file)
+    candidate = load_profile(profile)
+    projects = load_projects(portfolio)
+    fit = score_job(job, candidate, projects)
+    evidence = map_evidence(job, candidate, projects)
+    resume = render_resume(job, candidate, projects, fit, evidence)
+    console.print(render_ats_report(score_resume_ats(resume, job, evidence)))
+
+
+@app.command(name="interview-prep")
+def interview_prep_command(job_file: Path, profile: Path = DEFAULT_PROFILE, portfolio: Path = DEFAULT_PORTFOLIO) -> None:
+    """Generate interview prep from a job description and evidence map."""
+    job = parse_job_file(job_file)
+    candidate = load_profile(profile)
+    projects = load_projects(portfolio)
+    fit = score_job(job, candidate, projects)
+    evidence = map_evidence(job, candidate, projects)
+    console.print(render_interview_prep(generate_interview_prep(job, fit, evidence)))
+
+
 @app.command(name="ingest-github-repo")
 def ingest_github_repo(
     repo_name: str,
@@ -95,7 +120,7 @@ def fetch_github_repo(
     ref: str = typer.Option("main", help="Git ref/branch to scan."),
     output: Path = typer.Option(Path("profile/github_portfolio.generated.yaml")),
 ) -> None:
-    """Fetch a public GitHub repository tree through the GitHub API and create portfolio evidence YAML."""
+    """Fetch a GitHub repository tree through the GitHub API and create portfolio evidence YAML."""
     write_remote_repo_summary(owner, repo, output, ref=ref)
     console.print(f"[bold green]Remote GitHub portfolio summary written:[/bold green] {output}")
 
@@ -173,6 +198,8 @@ def validate_pack(pack_dir: Path) -> None:
         "11_truthfulness_report.md",
         "12_missing_skills_report.md",
         "13_resume_diff.md",
+        "14_ats_score_report.md",
+        "15_interview_prep.md",
     ]
     missing = [name for name in required if not (pack_dir / name).exists()]
     if missing:

@@ -4,7 +4,7 @@ from app.core.application_tracker import append_application_record, export_track
 from app.core.evidence_matcher import map_evidence
 from app.core.fit_scorer import score_job
 from app.core.generators import write_application_pack
-from app.core.github_portfolio import scan_local_repo, summarize_repo_tree
+from app.core.github_portfolio import scan_local_repo, summarize_repo_tree, write_portfolio_summary
 from app.core.missing_skills import analyze_missing_skills
 from app.core.profile_loader import load_profile, load_projects, load_rules
 from app.core.jd_parser import parse_job_description, parse_job_file
@@ -86,6 +86,23 @@ def test_github_repo_ingestion_detects_project_evidence():
     assert "GitHub Actions" in summary["tech_stack"]
     assert "AI Testing" in summary["tech_stack"]
     assert "GenAI QA" in summary["relevant_for"]
+    assert summary["metadata"]["file_count"] == 5
+    assert summary["metadata"]["has_readme"] is True
+
+
+def test_github_portfolio_yaml_writer_outputs_loadable_project_schema(tmp_path):
+    output = tmp_path / "portfolio.yaml"
+    write_portfolio_summary(
+        "job-agent",
+        ["README.md", "README.md", "app/main.py", "tests/test_app.py", ".github/workflows/ci.yml"],
+        output,
+        "LLM prompt validation",
+    )
+    projects = load_projects(output)
+    assert len(projects) == 1
+    assert projects[0].name == "job-agent"
+    assert "GitHub Actions" in projects[0].tech_stack
+    assert "SDET" in projects[0].relevant_for
 
 
 def test_local_repo_scan_ignores_noise_and_reads_readme(tmp_path):

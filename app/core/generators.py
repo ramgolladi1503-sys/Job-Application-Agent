@@ -10,6 +10,8 @@ from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
 
 from app.core.application_tracker import append_application_record
+from app.core.ats_scorer import render_ats_report, score_resume_ats
+from app.core.interview_prep import generate_interview_prep, render_interview_prep
 from app.core.missing_skills import analyze_missing_skills, render_missing_skills_report
 from app.core.resume_diff import create_resume_diff
 from app.models import CandidateProfile, EvidenceMatch, FitScore, JobDescription, Project, ResumeRules
@@ -65,7 +67,7 @@ def render_evidence_map(matches: list[EvidenceMatch]) -> str:
 
 
 def render_notes(job: JobDescription, fit: FitScore) -> str:
-    return "\n".join(["# Application Notes", "", f"Role: {job.role_title}", f"Company: {job.company}", f"Decision: {fit.decision}", f"Best positioning: {fit.best_positioning}", "", "## Manual Approval Checklist", "", "- [ ] Resume reviewed", "- [ ] Cover letter reviewed", "- [ ] Recruiter message reviewed", "- [ ] Fit score accepted", "- [ ] User manually submitted application", "", "This pack is preparation-only. No auto-apply action has been taken."])
+    return "\n".join(["# Application Notes", "", f"Role: {job.role_title}", f"Company: {job.company}", f"Decision: {fit.decision}", f"Best positioning: {fit.best_positioning}", "", "## Manual Approval Checklist", "", "- [ ] Resume reviewed", "- [ ] Cover letter reviewed", "- [ ] Recruiter message reviewed", "- [ ] Fit score accepted", "- [ ] ATS report reviewed", "- [ ] Interview prep reviewed", "- [ ] User manually submitted application", "", "This pack is preparation-only. No auto-apply action has been taken."])
 
 
 def write_docx(markdown_text: str, output_path: Path) -> None:
@@ -103,6 +105,8 @@ def write_application_pack(output_dir: str | Path, job: JobDescription, profile:
     base_resume = render_base_resume(profile, projects)
     resume = render_resume(job, profile, projects, fit, evidence)
     missing_report = render_missing_skills_report(analyze_missing_skills(job, profile, projects))
+    ats_report = render_ats_report(score_resume_ats(resume, job, evidence))
+    interview_report = render_interview_prep(generate_interview_prep(job, fit, evidence))
     files = {
         "01_raw_job_description.txt": job.raw_text,
         "02_parsed_job_description.json": json.dumps(job.model_dump(), indent=2),
@@ -115,6 +119,8 @@ def write_application_pack(output_dir: str | Path, job: JobDescription, profile:
         "11_truthfulness_report.md": render_truthfulness_report(validate_claims(resume, evidence, rules)),
         "12_missing_skills_report.md": missing_report,
         "13_resume_diff.md": create_resume_diff(base_resume, resume),
+        "14_ats_score_report.md": ats_report,
+        "15_interview_prep.md": interview_report,
     }
     written = []
     for name, content in files.items():

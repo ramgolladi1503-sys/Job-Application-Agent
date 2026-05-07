@@ -36,21 +36,27 @@ This project does **not** auto-apply to LinkedIn, Indeed, Naukri, Workday, or co
 
 Most resume generators produce generic, inflated output. PortfolioFit Agent is built around one stricter rule:
 
-> Every strong resume claim must trace back to profile data, work history, or project evidence.
+> Every strong resume claim must trace back to profile data, work history, GitHub repository evidence, or project proof.
 
 That makes it useful for serious candidates who want targeted applications without fake experience.
 
 ## Key features
 
 - Structured candidate profile loader
+- Plain-text resume import into starter YAML profile
 - Project portfolio evidence engine
+- Local repository scan for portfolio evidence
+- Public GitHub API repository scan for portfolio evidence
 - Heuristic job description parser
-- Fit scoring with reasoning
+- Weighted fit scoring with aliases, partial matches, risk penalties, and reasoning
 - Evidence-to-requirement mapping
+- Missing-skills report
+- Resume diff report
 - Role-specific resume generation
 - Cover letter generation
 - Recruiter message generation
 - Application pack folder creation
+- Application tracker with update/export commands
 - Truthfulness validator
 - Markdown, DOCX, and PDF exports
 - CLI-first workflow
@@ -125,10 +131,33 @@ portfoliofit generate-pack \
 
 ```bash
 portfoliofit init-profile
+portfoliofit import-resume resume.txt --candidate-name "Ram Golladi" --output profile/master_profile.generated.yaml
 portfoliofit parse-job data/sample_jobs/dotnet_react_qa_job.txt
 portfoliofit score-job data/sample_jobs/dotnet_react_qa_job.txt
 portfoliofit generate-pack data/sample_jobs/genai_qa_job.txt
 portfoliofit validate-pack outputs/applications/genai_qa_demo
+```
+
+Repository ingestion:
+
+```bash
+portfoliofit scan-local-repo ../tradebot --output profile/tradebot.generated.yaml
+portfoliofit fetch-github-repo ramgolladi1503-sys Job-Application-Agent --output profile/job_agent.generated.yaml
+portfoliofit ingest-github-repo my-repo file_list.txt --readme README.md --output profile/my_repo.generated.yaml
+```
+
+Application tracker:
+
+```bash
+portfoliofit tracker-summary
+portfoliofit tracker-update "Example AI Labs" "GenAI QA Engineer" submitted --follow-up-date 2026-05-14 --notes "Submitted manually"
+portfoliofit tracker-export exports/application_tracker.csv
+```
+
+Generated examples:
+
+```bash
+python scripts/generate_examples.py
 ```
 
 ## Application pack output
@@ -147,6 +176,8 @@ Each generated pack contains:
 09_recruiter_message.md
 10_application_notes.md
 11_truthfulness_report.md
+12_missing_skills_report.md
+13_resume_diff.md
 ```
 
 ## Safety boundary
@@ -163,7 +194,7 @@ This project intentionally excludes:
 
 ## Project status
 
-MVP scaffold is ready: CLI, parser, scorer, evidence mapper, generators, validators, sample data, docs, tests, Docker, and CI.
+MVP+ scaffold is ready: CLI, resume import, parser, weighted scorer, evidence matcher, GitHub portfolio ingestion, missing-skills report, resume diff, application tracker, generators, validators, sample data, docs, tests, Docker, and CI.
 
 ## License
 

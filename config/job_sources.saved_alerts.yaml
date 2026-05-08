@@ -1,0 +1,39 @@
+# Saved job-alert/job-page sources for PortfolioFit discovery.
+# Put exported LinkedIn/Naukri/Indeed/Monster/job-page HTML or text files under data/job_alert_exports/.
+# Then enable the matching source below.
+
+sources:
+  - name: linkedin_genai_qa_alert_export
+    type: file
+    enabled: false
+    path: data/job_alert_exports/linkedin_genai_qa_alert.html
+
+  - name: linkedin_sdet_alert_export
+    type: file
+    enabled: false
+    path: data/job_alert_exports/linkedin_sdet_alert.html
+
+  - name: naukri_qa_automation_alert_export
+    type: file
+    enabled: false
+    path: data/job_alert_exports/naukri_qa_automation_alert.html
+
+  - name: naukri_dotnet_react_qa_alert_export
+    type: file
+    enabled: false
+    path: data/job_alert_exports/naukri_dotnet_react_qa_alert.html
+
+  - name: indeed_ai_testing_alert_export
+    type: file
+    enabled: false
+    path: data/job_alert_exports/indeed_ai_testing_alert.html
+
+  - name: monster_qa_alert_export
+    type: file
+    enabled: false
+    path: data/job_alert_exports/monster_qa_alert.html
+
+  - name: company_careers_saved_export
+    type: file
+    enabled: false
+    path: data/job_alert_exports/company_careers_saved_export.html

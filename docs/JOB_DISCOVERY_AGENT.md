@@ -63,7 +63,32 @@ Risky sources:
 
 Use those only through manual export or compliant access.
 
-## Discover jobs
+## Saved job-alert workflow
+
+For LinkedIn, Naukri, Indeed, Monster, and similar job boards, the safest workflow is:
+
+```text
+1. Create job alerts on the job site.
+2. Open the alert email or job page yourself.
+3. Save/export the HTML or text.
+4. Put the exported file under data/job_alert_exports/.
+5. Add it as a file source in config/job_sources.example.yaml.
+6. Run discovery and pack generation.
+```
+
+Example source:
+
+```yaml
+sources:
+  - name: linkedin_genai_qa_alert_export
+    type: file
+    enabled: true
+    path: data/job_alert_exports/linkedin_genai_qa_alert.html
+```
+
+This keeps control with you and avoids brittle or non-compliant scraping.
+
+## Discover jobs locally
 
 ```bash
 portfoliofit discover-jobs \
@@ -80,7 +105,7 @@ outputs/job_discovery/latest/discovery_report.md
 outputs/job_discovery/latest/job_descriptions/*.txt
 ```
 
-## Generate packs from discovered jobs
+## Generate packs from discovered jobs locally
 
 ```bash
 portfoliofit generate-packs-from-discovery \
@@ -93,6 +118,35 @@ portfoliofit generate-packs-from-discovery \
 ```
 
 The agent skips jobs below the minimum score and generates packs only for strong matches.
+
+## Run through GitHub Actions
+
+A workflow is available:
+
+```text
+.github/workflows/discover-and-prepare.yml
+```
+
+Manual run path:
+
+```text
+Actions -> Discover and Prepare Applications -> Run workflow
+```
+
+Inputs:
+
+```text
+limit      maximum discovered leads
+min_score  minimum score required to generate an application pack
+```
+
+Artifacts:
+
+```text
+discovered-job-leads-and-application-packs
+```
+
+The artifact contains discovery reports, normalized job descriptions, generated packs, and tracker CSV.
 
 ## Hiring manager / recruiter outreach
 

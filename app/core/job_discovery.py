@@ -6,6 +6,8 @@ import re
 import urllib.parse
 import urllib.request
 from dataclasses import asdict, dataclass
+from email import policy
+from email.parser import BytesParser
 from pathlib import Path
 from typing import Any
 
@@ -114,9 +116,12 @@ def _expand_sources(sources: list[dict[str, Any]]) -> list[dict[str, Any]]:
             continue
         pattern = source.get("pattern") or source.get("path")
         if source_type == "directory":
-            pattern = str(Path(source.get("path", "")).joinpath("*.html"))
-        matches = sorted(glob.glob(str(pattern)))
-        for path in matches:
+            folder = Path(source.get("path", ""))
+            patterns = [folder / "*.html", folder / "*.txt", folder / "*.eml"]
+            matches = [match for p in patterns for match in glob.glob(str(p))]
+        else:
+            matches = glob.glob(str(pattern))
+        for path in sorted(matches):
             expanded.append({"name": f"{source.get('name', 'saved_alert')}:{Path(path).name}", "type": "file", "enabled": True, "path": path})
     return expanded
 
@@ -130,10 +135,16 @@ def _read_yaml(path: str | Path) -> dict[str, Any]:
 
 def _load_source_text(source: dict[str, Any]) -> str:
     if source.get("type") == "file":
-        return Path(source["path"]).read_text(encoding="utf-8", errors="replace")
+        path = Path(source["path"])
+        if path.suffix.lower() == ".eml":
+            return _read_eml_text(path)
+        return path.read_text(encoding="utf-8", errors="replace")
     url = source.get("url", "")
     if url.startswith("file://"):
-        return Path(urllib.parse.urlparse(url).path).read_text(encoding="utf-8", errors="replace")
+        path = Path(urllib.parse.urlparse(url).path)
+        if path.suffix.lower() == ".eml":
+            return _read_eml_text(path)
+        return path.read_text(encoding="utf-8", errors="replace")
     request = urllib.request.Request(
         url,
         headers={
@@ -143,6 +154,25 @@ def _load_source_text(source: dict[str, Any]) -> str:
     )
     with urllib.request.urlopen(request, timeout=int(source.get("timeout_seconds", 20))) as response:
         return response.read().decode("utf-8", errors="replace")
+
+
+def _read_eml_text(path: Path) -> str:
+    message = BytesParser(policy=policy.default).parsebytes(path.read_bytes())
+    parts = []
+    if message["subject"]:
+        parts.append(f"Subject: {message['subject']}")
+    if message.is_multipart():
+        for part in message.walk():
+            content_type = part.get_content_type()
+            if content_type in {"text/plain", "text/html"}:
+                payload = part.get_content()
+                if isinstance(payload, str):
+                    parts.append(payload)
+    else:
+        payload = message.get_content()
+        if isinstance(payload, str):
+            parts.append(payload)
+    return "\n".join(parts)
 
 
 def _extract_job_leads(source_name: str, source_url: str, text: str) -> list[JobLead]:
@@ -222,7 +252,7 @@ def _field(text: str, names: list[str]) -> str:
 def _guess_title(text: str) -> str:
     for line in text.splitlines():
         cleaned = _clean_text(line)
-        if cleaned.lower().startswith(("company:", "location:", "apply:", "url:", "source:")):
+        if cleaned.lower().startswith(("company:", "location:", "apply:", "url:", "source:", "subject:")):
             continue
         if 5 <= len(cleaned) <= 90 and any(token in cleaned.lower() for token in ["qa", "sdet", "test", "automation", "genai", "ai", "engineer", "developer"]):
             return cleaned

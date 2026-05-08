@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import glob
 import json
 import re
 import urllib.parse
@@ -39,7 +40,7 @@ class JobLead:
 def discover_jobs_from_config(config_path: str | Path, output_dir: str | Path, limit: int = 25) -> list[JobLead]:
     config = _read_yaml(config_path)
     leads: list[JobLead] = []
-    for source in config.get("sources", []):
+    for source in _expand_sources(config.get("sources", [])):
         if not source.get("enabled", True):
             continue
         source_type = source.get("type", "url")
@@ -99,6 +100,25 @@ def render_discovery_report(leads: list[JobLead], failures: list[JobLead] | None
 def load_discovered_jobs(discovered_json: str | Path) -> list[JobLead]:
     data = json.loads(Path(discovered_json).read_text(encoding="utf-8"))
     return [JobLead(**item) for item in data.get("jobs", [])]
+
+
+def _expand_sources(sources: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    expanded: list[dict[str, Any]] = []
+    for source in sources:
+        if not source.get("enabled", True):
+            expanded.append(source)
+            continue
+        source_type = source.get("type", "url")
+        if source_type not in {"glob", "directory"}:
+            expanded.append(source)
+            continue
+        pattern = source.get("pattern") or source.get("path")
+        if source_type == "directory":
+            pattern = str(Path(source.get("path", "")).joinpath("*.html"))
+        matches = sorted(glob.glob(str(pattern)))
+        for path in matches:
+            expanded.append({"name": f"{source.get('name', 'saved_alert')}:{Path(path).name}", "type": "file", "enabled": True, "path": path})
+    return expanded
 
 
 def _read_yaml(path: str | Path) -> dict[str, Any]:

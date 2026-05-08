@@ -1,0 +1,150 @@
+projects:
+  - name: Tradebot
+    type: FinTech automation / trading workflow validation system
+    role: Builder and QA/SDET-focused validator
+    repo: https://github.com/ramgolladi1503-sys/tradebot
+    tech_stack:
+      - Python
+      - Pytest
+      - Docker
+      - CI/CD validation
+      - Runtime diagnostics
+      - Trading workflow validation
+      - Market data validation
+    relevant_for:
+      - QA Automation
+      - SDET
+      - FinTech QA
+      - API Testing
+      - Regression Testing
+      - CI/CD Testing
+      - Risk-Based Testing
+    evidence:
+      - Repository includes trading runtime scripts, dashboard/runtime components, tests, logs, runbooks, diagnostics, data folders, and strategy modules.
+      - Validated trading workflow risks including stale-feed handling, contract resolution, execution readiness, runtime gating, and regression failure analysis.
+      - Debugged issues around zero executable symbols, stale LTP/feed checks, option contract resolution, and dashboard rendering failures.
+      - Uses production-style operational concepts such as runtime logs, risk controls, replay/diagnostics, strategy validation, and test harnesses.
+      - Supports strong positioning for financial workflow QA, automation validation, and SDET-style system testing.
+    safe_resume_bullets:
+      - Built and validated automated workflows for financial trading scenarios covering stale data checks, contract validation, execution readiness, and runtime reliability.
+      - Designed testing coverage for trading workflow risks including stale market data, contract resolution failures, execution gates, dashboard defects, and regression failures.
+      - Used Dockerized/runtime-oriented workflows, test harnesses, logs, and diagnostics to improve repeatability of validation and debugging.
+      - Applied QA/SDET discipline to a complex fintech automation project involving strategy outputs, broker-instrument mapping, and execution-safety checks.
+    evidence_strength: Strong
+    caution:
+      - Do not claim guaranteed trading profitability.
+      - Do not claim institutional-grade trading infrastructure.
+      - Position as QA/SDET/automation and workflow validation evidence, not as financial advice or investment performance.
+
+  - name: MCP Shield
+    type: AI security gateway / GenAI QA / MCP runtime protection project
+    role: Product owner, builder, and AI testing strategist
+    repo: https://github.com/ramgolladi1503-sys/MCP
+    tech_stack:
+      - TypeScript
+      - MCP
+      - Policy Engine
+      - Runtime Gateway
+      - JSON-RPC validation
+      - CI Gates
+      - Security Corpus Tests
+      - Release Dry-Run Validation
+    relevant_for:
+      - GenAI QA
+      - AI Testing
+      - LLM Validation
+      - AI Safety
+      - Security Testing
+      - Policy Testing
+      - Agent Tool-Use Validation
+      - CI/CD Testing
+    evidence:
+      - Project is positioned as a runtime security gateway for AI agents and MCP tools.
+      - Includes CLI scanner, stdio runtime gateway, policy engine, audit/logging, security corpus, and developer demo workflow.
+      - Implements fail-closed approval behavior where APPROVE pauses execution instead of silently allowing risky actions.
+      - Blocked responses include safe alternative suggestions in JSON-RPC payloads.
+      - Network egress enforcement extracts URL-like arguments and commands, compares hosts to a domain allowlist, and blocks unknown domains with guidance.
+      - Release validation includes package dry-run publishing guarded by MCP_SHIELD_PUBLISH=1.
+      - QA/test evidence includes unit, integration, corpus, smoke, scanner, policy, and hardening CI gates.
+    safe_resume_bullets:
+      - Designed MCP Shield as an AI tool-use security and validation gateway focused on policy enforcement, risk controls, auditability, and production-safe agent behavior.
+      - Created GenAI QA strategies covering hallucination risk, model response validation, prompt behavior checks, JSON-RPC safety, and policy-based tool-use controls.
+      - Implemented and validated approval-gate, network allowlist, blocked-response, and release dry-run workflows to reduce unsafe agent behavior.
+      - Built security-focused test coverage across unit, integration, corpus, smoke, policy, and CI hardening checks for an MCP runtime gateway.
+    evidence_strength: Strong
+    caution:
+      - Do not claim ML model training ownership.
+      - Do not claim academic AI safety research background.
+      - Position as AI security/testing, MCP gateway validation, policy enforcement, and GenAI QA evidence.
+
+  - name: PortfolioFit Agent / Job Application Agent
+    type: Evidence-based job application preparation agent
+    role: Product owner and builder
+    repo: https://github.com/ramgolladi1503-sys/Job-Application-Agent
+    tech_stack:
+      - Python
+      - Typer CLI
+      - FastAPI
+      - Streamlit
+      - Pydantic
+      - Jinja2
+      - Pytest
+      - Docker
+      - GitHub Actions
+    relevant_for:
+      - QA Automation
+      - SDET
+      - GenAI QA
+      - AI Testing
+      - FastAPI Projects
+      - Automation Tools
+      - ATS Resume Systems
+      - Interview Prep Automation
+    evidence:
+      - Parses job descriptions, scores fit, maps evidence, generates tailored resumes, cover letters, recruiter messages, ATS reports, and interview prep.
+      - Includes CLI, FastAPI API layer, Streamlit dashboard, GitHub ingestion, tracker commands, tests, Docker, and CI.
+      - Enforces manual approval boundary and explicitly excludes LinkedIn auto-apply, portal automation, captcha bypass, and fake claim generation.
+      - Includes truthfulness validation, missing-skills reporting, resume diffing, ATS scoring, and evidence-backed output generation.
+      - CI passes lint and tests across supported Python versions.
+    safe_resume_bullets:
+      - Built PortfolioFit Agent, an evidence-based application preparation system that parses job descriptions, scores fit, maps project evidence, and generates tailored application packs.
+      - Added FastAPI, Streamlit, CLI workflows, GitHub portfolio ingestion, ATS scoring, interview-prep generation, tracker commands, Docker support, and CI-tested coverage.
+      - Designed safety boundaries preventing auto-apply behavior, fake skill injection, and unsupported resume claims while preserving manual approval gates.
+      - Implemented regression tests for scoring, evidence mapping, resume import, GitHub scanning, tracker updates, ATS scoring, API endpoints, and generated pack validation.
+    evidence_strength: Strong
+    caution:
+      - Use as evidence of automation/product-building and QA tooling, not as a commercial hiring platform unless deployed and used by external users.
+
+  - name: Automation Frameworks and QA Practice
+    type: QA automation / test strategy portfolio evidence
+    role: QA automation engineer and test strategist
+    tech_stack:
+      - Selenium
+      - Appium
+      - Playwright
+      - Cypress learning
+      - Postman
+      - Java
+      - TestNG
+      - Maven
+      - SQL
+      - Pytest
+    relevant_for:
+      - QA Automation
+      - SDET
+      - Mobile Testing
+      - API Testing
+      - Regression Testing
+      - Test Strategy
+    evidence:
+      - Background includes QA automation, mobile/API testing, test management, regression validation, and AI testing preparation.
+      - Tooling exposure includes Selenium, Postman, Perfecto, Appium, Java, TestNG, Maven, Git, SQL, Jenkins, Docker basics, Kubernetes basics, Playwright/Cypress learning.
+      - Certification context includes ISTQB Foundation, ISTQB AI Testing / CT-AI preparation, AWS Cloud Practitioner, and Salesforce Admin exposure.
+    safe_resume_bullets:
+      - Designed and executed functional, regression, API, mobile, and automation-focused test workflows across enterprise and portfolio systems.
+      - Built reusable validation practices using Selenium, Appium, Postman, Java/TestNG, Pytest, SQL, Git, and CI/CD-aware workflows.
+      - Applied structured QA methods including test planning, defect analysis, regression coverage, acceptance criteria review, and risk-based validation.
+    evidence_strength: Medium
+    caution:
+      - Keep tool depth honest. Mark Playwright/Cypress as learning or exposure unless backed by project evidence.
+      - Do not inflate Docker/Kubernetes beyond exposure unless a specific repo proves deeper ownership.

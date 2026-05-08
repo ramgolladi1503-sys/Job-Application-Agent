@@ -40,15 +40,37 @@ def render_base_resume(profile: CandidateProfile, projects: list[Project]) -> st
 
 
 def render_cover_letter(job: JobDescription, profile: CandidateProfile, fit: FitScore, evidence: list[EvidenceMatch]) -> str:
-    top = [e for e in evidence if e.evidence_strength == "Strong"][:3]
-    lines = [f"# Cover Letter — {job.role_title} at {job.company}", "", "Dear Hiring Team,", "", f"My background aligns with this role through {fit.best_positioning}.", "", "Relevant evidence:"]
-    lines += [f"- {e.candidate_evidence}" for e in top]
-    lines += ["", "I would welcome the chance to discuss how this experience maps to your team's quality, automation, and delivery needs.", "", "Regards,", profile.candidate.get("name", "Candidate")]
+    strong = [e for e in evidence if e.evidence_strength == "Strong"][:4]
+    project_names = _project_names(strong)
+    opening = _cover_opening(job, fit, project_names)
+    lines = [
+        f"# Cover Letter — {job.role_title} at {job.company}",
+        "",
+        "Dear Hiring Team,",
+        "",
+        opening,
+        "",
+        "The specific evidence I would bring to this role is:",
+    ]
+    for item in strong:
+        lines.append(f"- {item.requirement}: {item.resume_bullet}")
+    lines += [
+        "",
+        _cover_closing(job, fit),
+        "",
+        "Regards,",
+        profile.candidate.get("name", "Candidate"),
+    ]
     return "\n".join(lines)
 
 
-def render_recruiter_message(job: JobDescription, fit: FitScore) -> str:
-    return f"Hi [Name], I saw the {job.role_title} role at {job.company}. My strongest angle is {fit.best_positioning}. I have a tailored resume and evidence map ready for review and would be glad to discuss fit."
+def render_recruiter_message(job: JobDescription, fit: FitScore, evidence: list[EvidenceMatch]) -> str:
+    strong = [e for e in evidence if e.evidence_strength == "Strong"][:2]
+    proof = "; ".join(f"{e.source_project}: {e.requirement}" for e in strong if e.source_project) or "evidence-backed QA project work"
+    return (
+        f"Hi [Name], I saw the {job.role_title} role at {job.company}. My strongest fit is {fit.best_positioning}. "
+        f"The proof is not generic resume wording: {proof}. I have a tailored resume, evidence map, ATS report, and interview-prep pack ready for manual review."
+    )
 
 
 def render_fit_score(job: JobDescription, fit: FitScore) -> str:
@@ -114,7 +136,7 @@ def write_application_pack(output_dir: str | Path, job: JobDescription, profile:
         "04_evidence_map.md": render_evidence_map(evidence),
         "05_tailored_resume.md": resume,
         "08_cover_letter.md": render_cover_letter(job, profile, fit, evidence),
-        "09_recruiter_message.md": render_recruiter_message(job, fit),
+        "09_recruiter_message.md": render_recruiter_message(job, fit, evidence),
         "10_application_notes.md": render_notes(job, fit),
         "11_truthfulness_report.md": render_truthfulness_report(validate_claims(resume, evidence, rules)),
         "12_missing_skills_report.md": missing_report,
@@ -132,6 +154,29 @@ def write_application_pack(output_dir: str | Path, job: JobDescription, profile:
     written += [str(out / "06_tailored_resume.docx"), str(out / "07_tailored_resume.pdf")]
     append_application_record(out.parent / "application_tracker.csv", job, fit, out)
     return written
+
+
+def _cover_opening(job: JobDescription, fit: FitScore, project_names: list[str]) -> str:
+    project_text = ", ".join(project_names[:3]) if project_names else "my QA automation portfolio"
+    return (
+        f"I am applying for the {job.role_title} role with a focused angle: {fit.best_positioning}. "
+        f"My fit is backed by concrete project evidence from {project_text}, not broad claims."
+    )
+
+
+def _cover_closing(job: JobDescription, fit: FitScore) -> str:
+    return (
+        f"I would be useful in this {job.role_title} role because I can turn ambiguous requirements into testable risks, "
+        f"map those risks to automation or manual validation, and communicate gaps honestly. My positioning for this application is {fit.best_positioning}."
+    )
+
+
+def _project_names(evidence: list[EvidenceMatch]) -> list[str]:
+    names = []
+    for item in evidence:
+        if item.source_project and item.source_project not in names:
+            names.append(item.source_project)
+    return names
 
 
 def _strip_md(line: str) -> str:

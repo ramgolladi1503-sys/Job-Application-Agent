@@ -1,0 +1,40 @@
+name: Profile Pipeline
+
+on:
+  workflow_dispatch:
+  schedule:
+    # Weekly Monday 04:30 UTC. Adjust as needed.
+    - cron: "30 4 * * 1"
+
+jobs:
+  profile-pipeline:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e ".[dev]"
+
+      - name: Run connected profile pipeline
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: portfoliofit run-profile-pipeline --config config/profile_pipeline.yaml
+
+      - name: Upload profile pipeline outputs
+        uses: actions/upload-artifact@v4
+        with:
+          name: profile-pipeline-output
+          path: |
+            outputs/job_discovery/profile_pipeline/**
+            outputs/applications/profile_pipeline/**
+            outputs/applications/application_tracker.csv
+            profile/github_profile_pipeline.generated.yaml
+          if-no-files-found: warn

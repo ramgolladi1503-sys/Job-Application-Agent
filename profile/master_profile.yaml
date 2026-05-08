@@ -1,0 +1,136 @@
+candidate:
+  name: Ram Golladi
+  public_name: Ram Golladi
+  headline: QA/SDET engineer with fintech automation, AI security gateway, full-stack QA, Docker, CI/CD, and GenAI QA project experience
+  location: Canada / India
+  linkedin: https://www.linkedin.com/in/ram-golladi
+  github: https://github.com/ramgolladi1503-sys
+  target_roles:
+    - QA Automation Engineer
+    - SDET
+    - GenAI QA Engineer
+    - AI Testing Engineer
+    - Full Stack QA Engineer
+    - QA Engineer - .NET and React
+    - AI Safety / Agent Testing QA
+
+summary:
+  default: >
+    QA/SDET-focused engineer with experience in enterprise testing, automation strategy,
+    API validation, regression testing, full-stack QA exposure, Docker/CI/CD workflows,
+    and portfolio projects across fintech automation and AI security/testing. Strongest
+    positioning: practical QA engineer who can connect job requirements to real project
+    evidence, risk controls, validation workflows, and production-style delivery gates.
+  sdet_fullstack: >
+    QA Automation / SDET profile with full-stack exposure across .NET Core, React, MVC,
+    API testing, Docker, Kubernetes exposure, GitHub Actions, CI/CD validation, and
+    financial workflow testing through Tradebot. Best suited for roles needing a QA
+    engineer who understands both application behavior and release-quality gates.
+  genai_qa: >
+    GenAI QA / AI Testing profile focused on MCP Shield, LLM behavior validation,
+    hallucination-risk testing, prompt behavior checks, policy enforcement, tool-use
+    validation, human approval gates, auditability, and production-safe agent workflows.
+
+skills:
+  testing:
+    - Manual Testing
+    - Functional Testing
+    - Regression Testing
+    - API Testing
+    - System Testing
+    - Test Strategy
+    - Defect Analysis
+    - Risk-Based Testing
+    - Acceptance Criteria Review
+  automation:
+    - Selenium
+    - Appium
+    - Playwright
+    - Pytest
+    - TestNG
+    - Postman
+    - CI/CD validation
+    - Automated Regression Checks
+  development:
+    - .NET Core
+    - React
+    - MVC
+    - Python
+    - Java
+    - SQL
+    - TypeScript
+    - FastAPI
+  devops:
+    - Docker
+    - Kubernetes exposure
+    - GitHub Actions
+    - Jenkins exposure
+    - Release Gates
+    - Package Dry-Run Validation
+  ai_testing:
+    - LLM Evaluation
+    - GenAI QA
+    - Hallucination Testing
+    - Model Response Validation
+    - Prompt Testing
+    - Agent Tool-Use Validation
+    - MCP Security Testing
+    - Policy Enforcement Testing
+    - Human Approval Workflow Testing
+  domain:
+    - FinTech QA
+    - Trading Workflow Validation
+    - AI Security Gateway Testing
+    - Job Application Automation Preparation
+
+experience:
+  - title: QA / SDET / Automation Engineer
+    company: Professional and portfolio work
+    start: 2019
+    end: Present
+    bullets:
+      - Designed and executed functional, regression, API, and automation-focused validation workflows across enterprise and portfolio systems.
+      - Built evidence-backed QA positioning around real projects including Tradebot, MCP Shield, and PortfolioFit Agent.
+      - Validated financial and trading workflows involving stale-feed risks, contract resolution, execution readiness, runtime reliability, and regression failure analysis.
+      - Worked with Dockerized environments, GitHub Actions, CI/CD-style gates, release dry-runs, and test harnesses to improve delivery reliability.
+      - Designed GenAI QA strategies covering hallucination risk, prompt behavior, model response validation, policy controls, human approval workflows, and auditability.
+      - Created application-preparation workflows that generate fit scores, evidence maps, tailored resumes, ATS reports, and interview prep without auto-submitting applications.
+
+role_positioning:
+  dotnet_react_qa:
+    title: QA Automation / SDET with full-stack engineering exposure
+    lead_projects:
+      - Tradebot
+      - Automation Frameworks
+      - PortfolioFit Agent
+    emphasize:
+      - API testing
+      - Regression testing
+      - .NET Core exposure
+      - React exposure
+      - Docker and CI/CD validation
+      - Financial workflow validation
+    avoid_overclaiming:
+      - Deep production Kubernetes ownership unless separately evidenced
+      - Senior full-stack developer ownership unless the JD only asks exposure
+  genai_qa:
+    title: AI Testing / GenAI QA Engineer with automation and AI risk validation focus
+    lead_projects:
+      - MCP Shield
+      - PortfolioFit Agent
+      - Tradebot risk validation
+    emphasize:
+      - LLM behavior validation
+      - Hallucination-risk testing
+      - Prompt testing
+      - MCP tool-use validation
+      - Human approval gates
+      - Policy enforcement and auditability
+    avoid_overclaiming:
+      - ML research scientist background
+      - Model training ownership
+      - Production LLM ownership without evidence
+
+public_safety:
+  note: This file is public-safe and intentionally excludes personal phone numbers, private emails, immigration details, and private employer documents.
+  approval_boundary: Application preparation only; no auto-submit or job-portal automation.

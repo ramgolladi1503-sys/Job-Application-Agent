@@ -1,0 +1,39 @@
+# Copy this file to config/job_sources.real.yaml and customize it.
+# Keep config/job_sources.real.yaml private if it contains personal searches, local paths, or saved job-alert files.
+
+sources:
+  # Best option: saved job-alert emails or manually exported job pages.
+  # Save the email/page as .html or .txt and point to it here.
+  - name: saved_job_alerts_local_export
+    type: file
+    enabled: false
+    path: /absolute/path/to/saved_job_alerts.html
+
+  # Good option: company career pages that are public and do not require login/captcha.
+  - name: company_careers_public_page
+    type: search_url
+    enabled: false
+    url: "https://example.com/careers?query=qa%20automation"
+    timeout_seconds: 20
+
+  # LinkedIn/Naukri/Indeed/Monster should usually be handled through saved/exported pages,
+  # job-alert emails, or manual copy. Do not use this project to bypass login walls or anti-bot controls.
+  - name: linkedin_exported_page
+    type: file
+    enabled: false
+    path: /absolute/path/to/linkedin_saved_jobs_export.html
+
+  - name: naukri_exported_page
+    type: file
+    enabled: false
+    path: /absolute/path/to/naukri_saved_jobs_export.html
+
+  - name: indeed_exported_page
+    type: file
+    enabled: false
+    path: /absolute/path/to/indeed_saved_jobs_export.html
+
+  - name: monster_exported_page
+    type: file
+    enabled: false
+    path: /absolute/path/to/monster_saved_jobs_export.html

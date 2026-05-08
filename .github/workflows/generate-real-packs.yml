@@ -1,0 +1,67 @@
+name: Generate Real Application Packs
+
+on:
+  workflow_dispatch:
+  push:
+    branches: ["main"]
+    paths:
+      - "profile/master_profile.yaml"
+      - "profile/project_portfolio.yaml"
+      - "profile/resume_rules.yaml"
+      - "data/sample_jobs/*.txt"
+      - ".github/workflows/generate-real-packs.yml"
+      - "app/**"
+
+jobs:
+  generate-real-packs:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e ".[dev]"
+
+      - name: Generate GenAI QA real-profile pack
+        run: |
+          portfoliofit generate-pack \
+            data/sample_jobs/genai_qa_job.txt \
+            --profile profile/master_profile.yaml \
+            --portfolio profile/project_portfolio.yaml \
+            --rules profile/resume_rules.yaml \
+            --output outputs/applications/real_genai_qa_demo
+
+      - name: Validate GenAI QA real-profile pack
+        run: portfoliofit validate-pack outputs/applications/real_genai_qa_demo
+
+      - name: Generate .NET React QA real-profile pack
+        run: |
+          portfoliofit generate-pack \
+            data/sample_jobs/dotnet_react_qa_job.txt \
+            --profile profile/master_profile.yaml \
+            --portfolio profile/project_portfolio.yaml \
+            --rules profile/resume_rules.yaml \
+            --output outputs/applications/real_dotnet_react_qa_demo
+
+      - name: Validate .NET React QA real-profile pack
+        run: portfoliofit validate-pack outputs/applications/real_dotnet_react_qa_demo
+
+      - name: Show generated tracker summary
+        run: portfoliofit tracker-summary --tracker outputs/applications/application_tracker.csv
+
+      - name: Upload real application packs
+        uses: actions/upload-artifact@v4
+        with:
+          name: real-application-packs
+          path: |
+            outputs/applications/real_genai_qa_demo/**
+            outputs/applications/real_dotnet_react_qa_demo/**
+            outputs/applications/application_tracker.csv
+          if-no-files-found: error

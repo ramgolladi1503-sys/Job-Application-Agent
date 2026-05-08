@@ -1,8 +1,20 @@
 # Saved job-alert/job-page sources for PortfolioFit discovery.
 # Put exported LinkedIn/Naukri/Indeed/Monster/job-page HTML or text files under data/job_alert_exports/.
-# Then enable the matching source below.
+# The glob sources below automatically pick up saved .html and .txt files in that folder.
 
 sources:
+  - name: all_saved_job_alert_html_exports
+    type: glob
+    enabled: true
+    pattern: data/job_alert_exports/*.html
+
+  - name: all_saved_job_alert_text_exports
+    type: glob
+    enabled: true
+    pattern: data/job_alert_exports/*.txt
+
+  # Optional explicit sources. Enable these if you want named source tracking per platform.
+
   - name: linkedin_genai_qa_alert_export
     type: file
     enabled: false

@@ -1,7 +1,9 @@
 from __future__ import annotations
 
 import glob
+import imaplib
 import json
+import os
 import re
 import urllib.parse
 import urllib.request
@@ -46,7 +48,7 @@ def discover_jobs_from_config(config_path: str | Path, output_dir: str | Path, l
         if not source.get("enabled", True):
             continue
         source_type = source.get("type", "url")
-        if source_type not in {"url", "search_url", "file"}:
+        if source_type not in {"url", "search_url", "file", "imap"}:
             continue
         try:
             text = _load_source_text(source)
@@ -134,6 +136,8 @@ def _read_yaml(path: str | Path) -> dict[str, Any]:
 
 
 def _load_source_text(source: dict[str, Any]) -> str:
+    if source.get("type") == "imap":
+        return _read_imap_alerts(source)
     if source.get("type") == "file":
         path = Path(source["path"])
         if path.suffix.lower() == ".eml":
@@ -156,8 +160,37 @@ def _load_source_text(source: dict[str, Any]) -> str:
         return response.read().decode("utf-8", errors="replace")
 
 
+def _read_imap_alerts(source: dict[str, Any]) -> str:
+    host = source.get("host", "imap.gmail.com")
+    username = os.getenv(source.get("username_env", "JOB_ALERT_EMAIL_USERNAME"), "")
+    password = os.getenv(source.get("password_env", "JOB_ALERT_EMAIL_PASSWORD"), "")
+    mailbox = source.get("mailbox", "INBOX")
+    search_query = source.get("search", "ALL")
+    max_messages = int(source.get("max_messages", 20))
+    if not username or not password:
+        raise ValueError("IMAP credentials are missing. Set the configured username_env and password_env secrets.")
+    with imaplib.IMAP4_SSL(host) as client:
+        client.login(username, password)
+        client.select(mailbox)
+        status, data = client.search(None, search_query)
+        if status != "OK":
+            raise RuntimeError(f"IMAP search failed: {status}")
+        message_ids = data[0].split()[-max_messages:]
+        parts = []
+        for message_id in message_ids:
+            status, payload = client.fetch(message_id, "(RFC822)")
+            if status != "OK" or not payload or not isinstance(payload[0], tuple):
+                continue
+            parts.append(_email_bytes_to_text(payload[0][1]))
+        return "\n\n".join(parts)
+
+
 def _read_eml_text(path: Path) -> str:
-    message = BytesParser(policy=policy.default).parsebytes(path.read_bytes())
+    return _email_bytes_to_text(path.read_bytes())
+
+
+def _email_bytes_to_text(raw: bytes) -> str:
+    message = BytesParser(policy=policy.default).parsebytes(raw)
     parts = []
     if message["subject"]:
         parts.append(f"Subject: {message['subject']}")

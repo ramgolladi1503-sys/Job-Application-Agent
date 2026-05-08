@@ -1,27 +1,38 @@
 # {{ profile.candidate.name | default("Candidate Name") }}
 
-AI Testing / GenAI QA / Automation-focused QA Engineer
+GenAI QA / AI Testing Engineer — MCP Security, LLM Validation, Tool-Use Risk Controls
 
 ## Target Role
 
 {{ job.role_title }} — {{ job.company }}
 
-## Professional Summary
+## Targeted Professional Summary
 
 {{ profile.summary.genai_qa | default(profile.summary.default) }}
 
-Best positioning for this role: {{ fit_score.best_positioning }}.
+For this role, the strongest angle is **{{ fit_score.best_positioning }}**. The most relevant evidence is MCP Shield for AI tool-use validation, policy enforcement, hallucination-risk testing, JSON-RPC safety, approval gates, and audit-friendly agent workflows.
 
-## AI Testing and QA Skills
+## Role-Matched Evidence
 
-{% for group, skills in profile.skills.items() -%}
-**{{ group | replace("_", " ") | title }}:** {{ skills | join(", ") }}
+{% for match in evidence_matches[:8] -%}
+- **{{ match.requirement }}:** {{ match.resume_bullet }}
 {% endfor %}
 
-## GenAI / AI Safety Evidence
+## GenAI / AI Safety Project Evidence
 
-{% for match in evidence_matches[:7] -%}
-- {{ match.resume_bullet }}
+{% for project in projects if project.name in ["MCP Shield", "PortfolioFit Agent / Job Application Agent"] -%}
+### {{ project.name }}
+{{ project.type }} — {{ project.role }}
+
+{% for item in project.evidence[:5] -%}
+- {{ item }}
+{% endfor %}
+{% endfor %}
+
+## Core Skills for This Role
+
+{% for group, skills in profile.skills.items() if group in ["ai_testing", "testing", "automation", "development", "devops"] -%}
+**{{ group | replace("_", " ") | title }}:** {{ skills | join(", ") }}
 {% endfor %}
 
 ## Experience
@@ -31,18 +42,6 @@ Best positioning for this role: {{ fit_score.best_positioning }}.
 {{ item.start }} - {{ item.end }}
 
 {% for bullet in item.bullets -%}
-- {{ bullet }}
-{% endfor %}
-{% endfor %}
-
-## Selected Projects
-
-{% for project in projects if "AI" in project.relevant_for or "GenAI QA" in project.relevant_for or "AI Testing" in project.relevant_for -%}
-### {{ project.name }}
-
-{{ project.type }} — {{ project.role }}
-
-{% for bullet in project.safe_resume_bullets -%}
 - {{ bullet }}
 {% endfor %}
 {% endfor %}

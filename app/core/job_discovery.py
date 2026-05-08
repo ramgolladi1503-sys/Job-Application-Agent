@@ -199,7 +199,7 @@ def _split_possible_job_blocks(text: str) -> list[str]:
     cleaned = re.sub(r"</(p|div|li|section|article|tr|h\d)>", "\n", cleaned, flags=re.I)
     cleaned = re.sub(r"<[^>]+>", " ", cleaned)
     cleaned = _html_unescape(cleaned)
-    chunks = re.split(r"\n\s*\n|(?=\b(?:Role|Job Title|Title|Company):)", cleaned)
+    chunks = re.split(r"\n\s*\n|(?=\b(?:Role|Job Title|Title):)", cleaned)
     return [chunk.strip() for chunk in chunks if len(chunk.strip()) > 80]
 
 
@@ -222,6 +222,8 @@ def _field(text: str, names: list[str]) -> str:
 def _guess_title(text: str) -> str:
     for line in text.splitlines():
         cleaned = _clean_text(line)
+        if cleaned.lower().startswith(("company:", "location:", "apply:", "url:", "source:")):
+            continue
         if 5 <= len(cleaned) <= 90 and any(token in cleaned.lower() for token in ["qa", "sdet", "test", "automation", "genai", "ai", "engineer", "developer"]):
             return cleaned
     return ""

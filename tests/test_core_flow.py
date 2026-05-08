@@ -36,6 +36,20 @@ def test_genai_qa_job_highlights_mcp_shield(tmp_path):
     assert (tmp_path / "application_tracker.csv").exists()
 
 
+def test_generated_resume_uses_requirement_specific_bullets():
+    job = parse_job_file(ROOT / "data/sample_jobs/genai_qa_job.txt")
+    profile = load_profile(ROOT / "profile/master_profile.yaml")
+    projects = load_projects(ROOT / "profile/project_portfolio.yaml")
+    fit = score_job(job, profile, projects)
+    evidence = map_evidence(job, profile, projects)
+    resume = render_resume(job, profile, projects, fit, evidence)
+    bullets = [item.resume_bullet for item in evidence if item.resume_bullet]
+    assert len(set(bullets)) >= 4
+    assert "JSON-RPC" in resume or "approval" in resume.lower()
+    assert "MCP Shield" in resume
+    assert "The strongest proof is" not in resume
+
+
 def test_dotnet_react_job_scores_as_apply():
     job = parse_job_file(ROOT / "data/sample_jobs/dotnet_react_qa_job.txt")
     profile = load_profile(ROOT / "profile/master_profile.example.yaml")

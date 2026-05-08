@@ -1,0 +1,29 @@
+# Saved job-alert source config.
+# Use this when you save/export alert emails or job pages from LinkedIn, Naukri, Indeed, Monster, or company career sites.
+# Keep sources as local files. Do not scrape logged-in pages or bypass anti-bot systems.
+
+sources:
+  - name: linkedin_genai_qa_alert_export
+    type: file
+    enabled: true
+    path: data/job_alert_exports/linkedin_genai_qa_alert.html
+
+  - name: linkedin_sdet_alert_export
+    type: file
+    enabled: true
+    path: data/job_alert_exports/linkedin_sdet_alert.html
+
+  - name: naukri_qa_automation_alert_export
+    type: file
+    enabled: true
+    path: data/job_alert_exports/naukri_qa_automation_alert.html
+
+  - name: indeed_dotnet_react_qa_alert_export
+    type: file
+    enabled: true
+    path: data/job_alert_exports/indeed_dotnet_react_qa_alert.html
+
+  - name: monster_ai_testing_alert_export
+    type: file
+    enabled: true
+    path: data/job_alert_exports/monster_ai_testing_alert.html

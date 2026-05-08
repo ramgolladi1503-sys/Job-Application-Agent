@@ -7,6 +7,7 @@ from app.core.fit_scorer import score_job
 from app.core.generators import render_resume, write_application_pack
 from app.core.github_portfolio import scan_local_repo, summarize_repo_tree, write_portfolio_summary
 from app.core.interview_prep import generate_interview_prep
+from app.core.job_discovery import discover_jobs_from_config, load_discovered_jobs
 from app.core.missing_skills import analyze_missing_skills
 from app.core.profile_loader import load_profile, load_projects, load_rules
 from app.core.jd_parser import parse_job_description, parse_job_file
@@ -34,6 +35,26 @@ def test_genai_qa_job_highlights_mcp_shield(tmp_path):
     assert (tmp_path / "pack/14_ats_score_report.md").exists()
     assert (tmp_path / "pack/15_interview_prep.md").exists()
     assert (tmp_path / "application_tracker.csv").exists()
+
+
+def test_job_discovery_extracts_and_normalizes_sample_jobs(tmp_path):
+    config = tmp_path / "sources.yaml"
+    sample_html = ROOT / "data/sample_jobs/job_discovery_sample.html"
+    config.write_text(
+        "sources:\n"
+        "  - name: sample\n"
+        "    type: file\n"
+        "    enabled: true\n"
+        f"    path: {sample_html.as_posix()}\n",
+        encoding="utf-8",
+    )
+    leads = discover_jobs_from_config(config, tmp_path / "discovery", limit=10)
+    assert leads
+    assert any("GenAI QA" in lead.title for lead in leads)
+    assert (tmp_path / "discovery/jobs.json").exists()
+    assert (tmp_path / "discovery/discovery_report.md").exists()
+    loaded = load_discovered_jobs(tmp_path / "discovery/jobs.json")
+    assert loaded[0].to_job_description_text().startswith("Company:")
 
 
 def test_generated_resume_uses_requirement_specific_bullets():

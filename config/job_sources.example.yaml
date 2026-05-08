@@ -1,0 +1,32 @@
+# PortfolioFit job discovery sources.
+# Keep this compliant: use public/search URLs, exported job-alert files, RSS feeds, or your own saved HTML.
+# Do not use this tool to bypass logins, captchas, robots restrictions, or platform anti-abuse systems.
+
+sources:
+  - name: sample_local_jobs
+    type: file
+    enabled: true
+    path: data/sample_jobs/job_discovery_sample.html
+
+  # Examples to customize manually. These may require browser login or may block automated fetches.
+  # Prefer saved job-alert emails, public company career pages, RSS/search pages, or manual exports.
+
+  - name: linkedin_saved_search_placeholder
+    type: search_url
+    enabled: false
+    url: "https://www.linkedin.com/jobs/search/?keywords=GenAI%20QA%20Engineer&location=India"
+
+  - name: naukri_saved_search_placeholder
+    type: search_url
+    enabled: false
+    url: "https://www.naukri.com/genai-qa-engineer-jobs"
+
+  - name: indeed_saved_search_placeholder
+    type: search_url
+    enabled: false
+    url: "https://www.indeed.com/jobs?q=GenAI+QA+Engineer"
+
+  - name: company_careers_placeholder
+    type: search_url
+    enabled: false
+    url: "https://example.com/careers"

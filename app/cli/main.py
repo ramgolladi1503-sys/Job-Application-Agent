@@ -17,6 +17,7 @@ from app.core.interview_prep import generate_interview_prep, render_interview_pr
 from app.core.jd_parser import parse_job_file
 from app.core.job_discovery import discover_jobs_from_config, load_discovered_jobs, write_job_lead_files
 from app.core.profile_loader import load_profile, load_projects, load_rules
+from app.core.profile_pipeline import run_profile_pipeline
 from app.core.resume_ingestion import ingest_resume_file
 
 app = typer.Typer(help="PortfolioFit Agent: evidence-backed job application pack generator.")
@@ -36,6 +37,20 @@ def init_profile(output: Path = typer.Option(Path("profile"), help="Directory fo
         destination = output / source.name.replace(".example", "")
         shutil.copyfile(source, destination)
         console.print(f"Created {destination}")
+
+
+@app.command(name="run-profile-pipeline")
+def run_profile_pipeline_command(
+    config: Path = typer.Option(Path("config/profile_pipeline.yaml"), help="Profile pipeline config YAML."),
+) -> None:
+    """Run profile sync, job discovery, filtering, pack generation, and next-action reporting."""
+    result = run_profile_pipeline(config)
+    console.print("[bold green]Profile pipeline completed.[/bold green]")
+    console.print(f"Discovered: {result.discovered_count}")
+    console.print(f"Generated packs: {result.generated_count}")
+    console.print(f"Skipped: {result.skipped_count}")
+    console.print(f"Next actions: {result.next_actions_path}")
+    console.print(f"Output directory: {result.output_dir}")
 
 
 @app.command(name="import-resume")

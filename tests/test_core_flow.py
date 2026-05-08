@@ -9,6 +9,7 @@ from app.core.github_portfolio import scan_local_repo, summarize_repo_tree, writ
 from app.core.interview_prep import generate_interview_prep
 from app.core.job_discovery import discover_jobs_from_config, load_discovered_jobs
 from app.core.missing_skills import analyze_missing_skills
+from app.core.profile_pipeline import run_profile_pipeline
 from app.core.profile_loader import load_profile, load_projects, load_rules
 from app.core.jd_parser import parse_job_description, parse_job_file
 from app.core.resume_ingestion import ingest_resume_text
@@ -85,6 +86,53 @@ def test_saved_alert_glob_discovery(tmp_path):
     titles = " ".join(lead.title for lead in leads)
     assert "AI Testing Engineer" in titles
     assert "QA Automation Engineer" in titles
+
+
+def test_profile_pipeline_generates_next_actions(tmp_path):
+    alert_file = tmp_path / "alert.html"
+    alert_file.write_text(
+        "<h2>GenAI QA Engineer</h2><p>Company: Pipeline AI</p><p>Location: Remote</p><p>Need AI Testing, LLM Evaluation, Prompt Testing, Model Validation, API Testing, and risk controls.</p>",
+        encoding="utf-8",
+    )
+    sources = tmp_path / "sources.yaml"
+    sources.write_text(
+        "sources:\n"
+        "  - name: pipeline_alert\n"
+        "    type: file\n"
+        "    enabled: true\n"
+        f"    path: {alert_file.as_posix()}\n",
+        encoding="utf-8",
+    )
+    config = tmp_path / "pipeline.yaml"
+    config.write_text(
+        f"""
+profile:
+  master_profile: {ROOT / 'profile/master_profile.yaml'}
+  project_portfolio: {ROOT / 'profile/project_portfolio.yaml'}
+  resume_rules: {ROOT / 'profile/resume_rules.yaml'}
+job_discovery:
+  sources_config: {sources}
+  output_dir: {tmp_path / 'discovery'}
+  limit: 10
+filtering:
+  min_fit_score: 60
+  high_priority_score: 80
+  blocked_keywords:
+    - PhD required
+portfolio_sync:
+  enabled: false
+application_generation:
+  output_dir: {tmp_path / 'apps'}
+next_actions:
+  report_path: {tmp_path / 'apps/00_next_actions.md'}
+""".strip(),
+        encoding="utf-8",
+    )
+    result = run_profile_pipeline(config)
+    assert result.discovered_count >= 1
+    assert result.generated_count >= 1
+    assert (tmp_path / "apps/00_next_actions.md").exists()
+    assert (tmp_path / "apps/00_pipeline_results.csv").exists()
 
 
 def test_generated_resume_uses_requirement_specific_bullets():

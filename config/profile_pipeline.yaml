@@ -1,0 +1,63 @@
+# PortfolioFit profile-to-pipeline configuration.
+# This connects your profile, portfolio, saved job alerts, GitHub evidence, filtering rules, and output folders.
+
+profile:
+  master_profile: profile/master_profile.yaml
+  project_portfolio: profile/project_portfolio.yaml
+  resume_rules: profile/resume_rules.yaml
+
+job_discovery:
+  sources_config: config/job_sources.saved_alerts.yaml
+  output_dir: outputs/job_discovery/profile_pipeline
+  limit: 50
+
+filtering:
+  min_fit_score: 70
+  high_priority_score: 82
+  target_roles:
+    - GenAI QA Engineer
+    - AI Testing Engineer
+    - SDET
+    - QA Automation Engineer
+    - QA Engineer - .NET and React
+  preferred_keywords:
+    - GenAI
+    - AI Testing
+    - LLM Evaluation
+    - MCP
+    - Selenium
+    - API Testing
+    - .NET Core
+    - React
+    - Docker
+    - CI/CD
+    - FinTech
+  blocked_keywords:
+    - PhD required
+    - Senior ML Research Scientist
+    - Manual testing only
+    - 10+ years required
+
+portfolio_sync:
+  enabled: true
+  generated_output: profile/github_profile_pipeline.generated.yaml
+  github_repositories:
+    - owner: ramgolladi1503-sys
+      repo: Job-Application-Agent
+      ref: main
+      enabled: true
+    - owner: ramgolladi1503-sys
+      repo: MCP
+      ref: main
+      enabled: false
+
+application_generation:
+  output_dir: outputs/applications/profile_pipeline
+  tracker: outputs/applications/application_tracker.csv
+  generate_only_above_threshold: true
+
+next_actions:
+  report_path: outputs/applications/profile_pipeline/00_next_actions.md
+  include_recruiter_message: true
+  include_interview_prep: true
+  include_ats_report: true

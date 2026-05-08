@@ -57,6 +57,36 @@ def test_job_discovery_extracts_and_normalizes_sample_jobs(tmp_path):
     assert loaded[0].to_job_description_text().startswith("Company:")
 
 
+def test_saved_alert_glob_discovery(tmp_path):
+    alerts = tmp_path / "alerts"
+    alerts.mkdir()
+    (alerts / "one.html").write_text(
+        "<h2>AI Testing Engineer</h2><p>Company: Guardrail AI</p><p>Location: Remote</p><p>Need LLM Evaluation, Prompt Testing, AI Testing, API Testing, and risk controls.</p>",
+        encoding="utf-8",
+    )
+    (alerts / "two.txt").write_text(
+        "Role: QA Automation Engineer\nCompany: FinQA Labs\nLocation: Hyderabad\nMust have Selenium, API Testing, Regression Testing, Docker, and CI/CD validation.",
+        encoding="utf-8",
+    )
+    config = tmp_path / "sources.yaml"
+    config.write_text(
+        "sources:\n"
+        "  - name: html_alerts\n"
+        "    type: glob\n"
+        "    enabled: true\n"
+        f"    pattern: {alerts.as_posix()}/*.html\n"
+        "  - name: text_alerts\n"
+        "    type: glob\n"
+        "    enabled: true\n"
+        f"    pattern: {alerts.as_posix()}/*.txt\n",
+        encoding="utf-8",
+    )
+    leads = discover_jobs_from_config(config, tmp_path / "discovery", limit=10)
+    titles = " ".join(lead.title for lead in leads)
+    assert "AI Testing Engineer" in titles
+    assert "QA Automation Engineer" in titles
+
+
 def test_generated_resume_uses_requirement_specific_bullets():
     job = parse_job_file(ROOT / "data/sample_jobs/genai_qa_job.txt")
     profile = load_profile(ROOT / "profile/master_profile.yaml")

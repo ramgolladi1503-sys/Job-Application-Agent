@@ -15,6 +15,7 @@ from app.core.generators import render_resume, write_application_pack
 from app.core.github_portfolio import write_local_repo_summary, write_portfolio_summary, write_remote_repo_summary
 from app.core.interview_prep import generate_interview_prep, render_interview_prep
 from app.core.jd_parser import parse_job_file
+from app.core.job_discovery import discover_jobs_from_config, load_discovered_jobs, write_job_lead_files
 from app.core.profile_loader import load_profile, load_projects, load_rules
 from app.core.resume_ingestion import ingest_resume_file
 
@@ -54,6 +55,49 @@ def parse_job(job_file: Path) -> None:
     """Parse a raw job description and print structured JSON."""
     job = parse_job_file(job_file)
     console.print_json(json.dumps(job.model_dump(), indent=2))
+
+
+@app.command(name="discover-jobs")
+def discover_jobs(
+    config: Path = typer.Option(Path("config/job_sources.example.yaml"), help="YAML file containing compliant job sources."),
+    output: Path = typer.Option(Path("outputs/job_discovery/latest"), help="Discovery output directory."),
+    limit: int = typer.Option(25, help="Maximum number of job leads to keep."),
+) -> None:
+    """Discover job leads from configured public/file sources and save normalized JD files."""
+    leads = discover_jobs_from_config(config, output, limit=limit)
+    console.print(f"[bold green]Discovered {len(leads)} job lead(s).[/bold green]")
+    console.print(f"Report: {output / 'discovery_report.md'}")
+    console.print(f"Job descriptions: {output / 'job_descriptions'}")
+
+
+@app.command(name="generate-packs-from-discovery")
+def generate_packs_from_discovery(
+    discovered_json: Path = typer.Argument(..., help="Path to outputs/job_discovery/.../jobs.json"),
+    profile: Path = typer.Option(Path("profile/master_profile.yaml"), help="Candidate profile YAML."),
+    portfolio: Path = typer.Option(Path("profile/project_portfolio.yaml"), help="Project portfolio YAML."),
+    rules: Path = typer.Option(Path("profile/resume_rules.yaml"), help="Resume rules YAML."),
+    output: Path = typer.Option(Path("outputs/applications/discovered_jobs"), help="Output folder for generated packs."),
+    min_score: int = typer.Option(70, help="Only generate packs for jobs scoring at or above this fit score."),
+) -> None:
+    """Score discovered jobs and generate application packs for strong matches."""
+    leads = load_discovered_jobs(discovered_json)
+    job_files = write_job_lead_files(leads, output / "job_descriptions")
+    candidate = load_profile(profile)
+    projects = load_projects(portfolio)
+    resume_rules = load_rules(rules)
+    generated = 0
+    for job_file in job_files:
+        job = parse_job_file(job_file)
+        fit = score_job(job, candidate, projects)
+        if fit.final_score < min_score:
+            console.print(f"[yellow]Skipped[/yellow] {job.role_title} at {job.company}: {fit.final_score}/100")
+            continue
+        evidence = map_evidence(job, candidate, projects)
+        pack_dir = output / _safe_folder_name(f"{job.company}_{job.role_title}_{fit.final_score}")
+        write_application_pack(pack_dir, job, candidate, projects, resume_rules, fit, evidence)
+        generated += 1
+        console.print(f"[green]Generated[/green] {pack_dir} ({fit.final_score}/100)")
+    console.print(f"[bold green]Generated {generated} application pack(s).[/bold green]")
 
 
 @app.command(name="score-job")
@@ -208,6 +252,11 @@ def validate_pack(pack_dir: Path) -> None:
             console.print(f"- Missing: {name}")
         raise typer.Exit(code=1)
     console.print("[bold green]Pack is complete and ready for manual review.[/bold green]")
+
+
+def _safe_folder_name(value: str) -> str:
+    cleaned = "".join(char.lower() if char.isalnum() else "_" for char in value)
+    return "_".join(part for part in cleaned.split("_") if part)[:120]
 
 
 if __name__ == "__main__":

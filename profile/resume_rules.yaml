@@ -1,0 +1,76 @@
+rules:
+  approval_gate:
+    require_manual_review: true
+    auto_apply_allowed: false
+    user_must_submit_manually: true
+
+  public_safety:
+    exclude_private_contact_details: true
+    exclude_private_employer_documents: true
+    exclude_immigration_details: true
+    exclude_unverified_salary_details: true
+
+  ats:
+    use_tables: false
+    use_photos: false
+    use_icons: false
+    max_pages: 2
+    prefer_plain_headings: true
+    prefer_bullets: true
+
+  forbidden_claims:
+    - Guaranteed profitable trading system
+    - Institutional-grade trading infrastructure
+    - Owned production Kubernetes infrastructure
+    - Senior ML researcher
+    - Expert in advanced machine learning model training
+    - Production LLM owner
+    - Built real-time interview cheating proxy
+    - Auto-applied to jobs on behalf of users
+    - Bypassed CAPTCHA or job portal controls
+    - Full-stack architect unless directly evidenced
+
+  caution_terms:
+    expert: Use only when directly evidenced.
+    production: Use as production-style or production-safe design unless real production ownership is proven.
+    Kubernetes: Use exposure or validation support unless specific project ownership exists.
+    AI safety: Position as AI testing, AI risk validation, policy enforcement, and MCP gateway work; avoid academic research claims.
+    trading: Position as workflow validation and QA automation; avoid performance/profit claims.
+
+  role_rules:
+    dotnet_react_qa:
+      positioning: QA Automation / SDET with full-stack exposure
+      emphasize:
+        - QA automation
+        - API testing
+        - regression testing
+        - .NET Core exposure
+        - React exposure
+        - Docker and CI/CD validation
+        - Tradebot financial workflow validation
+      avoid:
+        - senior full-stack ownership without evidence
+        - deep Kubernetes ownership without evidence
+    genai_qa:
+      positioning: GenAI QA / AI Testing with MCP security and risk validation focus
+      emphasize:
+        - MCP Shield
+        - LLM behavior validation
+        - hallucination-risk testing
+        - prompt testing
+        - policy enforcement
+        - tool-use validation
+        - human approval gates
+      avoid:
+        - ML research scientist claims
+        - model training ownership
+        - production LLM platform ownership
+
+  truthfulness:
+    every_resume_bullet_must_trace_to:
+      - master_profile.yaml
+      - project_portfolio.yaml
+      - user-approved evidence
+      - generated GitHub portfolio YAML reviewed by user
+    missing_skill_policy: Mark as missing or weak; do not convert to a strength.
+    weak_skill_policy: Position as exposure, learning, or adjacent experience only.

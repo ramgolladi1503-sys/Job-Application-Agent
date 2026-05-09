@@ -1,8 +1,21 @@
-# Saved job-alert/job-page sources for PortfolioFit discovery.
-# Put exported LinkedIn/Naukri/Indeed/Monster/job-page HTML or text files under data/job_alert_exports/.
-# The glob sources below automatically pick up saved .html and .txt files in that folder.
+# Saved job-alert/job-page/email sources for PortfolioFit discovery.
+# Preferred fully automated path: job-site alerts -> email inbox -> IMAP source below.
+# Fallback path: put exported LinkedIn/Naukri/Indeed/Monster/job-page HTML/TXT/EML files under data/job_alert_exports/.
 
 sources:
+  # Automated email alert ingestion. Enable after setting repository secrets:
+  # JOB_ALERT_EMAIL_USERNAME and JOB_ALERT_EMAIL_PASSWORD.
+  # For Gmail, use an app password, not your normal account password.
+  - name: gmail_job_alerts_inbox
+    type: imap
+    enabled: false
+    host: imap.gmail.com
+    mailbox: INBOX
+    username_env: JOB_ALERT_EMAIL_USERNAME
+    password_env: JOB_ALERT_EMAIL_PASSWORD
+    search: '(OR FROM "jobalerts-noreply@linkedin.com" OR FROM "noreply@naukri.com" OR FROM "alert@indeed.com")'
+    max_messages: 30
+
   - name: all_saved_job_alert_html_exports
     type: glob
     enabled: true
@@ -12,6 +25,11 @@ sources:
     type: glob
     enabled: true
     pattern: data/job_alert_exports/*.txt
+
+  - name: all_saved_job_alert_eml_exports
+    type: glob
+    enabled: true
+    pattern: data/job_alert_exports/*.eml
 
   # Optional explicit sources. Enable these if you want named source tracking per platform.
 

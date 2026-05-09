@@ -2,6 +2,11 @@ name: Profile Pipeline
 
 on:
   workflow_dispatch:
+    inputs:
+      fetch_email_alerts:
+        description: "Fetch job-alert emails before running pipeline"
+        required: false
+        default: "false"
   schedule:
     # Weekly Monday 04:30 UTC. Adjust as needed.
     - cron: "30 4 * * 1"
@@ -23,11 +28,19 @@ jobs:
           python -m pip install --upgrade pip
           pip install -e ".[dev]"
 
+      - name: Fetch job-alert emails
+        if: ${{ github.event.inputs.fetch_email_alerts == 'true' }}
+        env:
+          JOB_ALERT_IMAP_HOST: ${{ secrets.JOB_ALERT_IMAP_HOST }}
+          JOB_ALERT_IMAP_USERNAME: ${{ secrets.JOB_ALERT_IMAP_USERNAME }}
+          JOB_ALERT_IMAP_PASSWORD: ${{ secrets.JOB_ALERT_IMAP_PASSWORD }}
+          JOB_ALERT_IMAP_MAILBOX: ${{ secrets.JOB_ALERT_IMAP_MAILBOX }}
+          JOB_ALERT_IMAP_QUERY: ${{ secrets.JOB_ALERT_IMAP_QUERY }}
+        run: portfoliofit fetch-job-alert-emails --output data/job_alert_exports --limit 50
+
       - name: Run connected profile pipeline
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          JOB_ALERT_EMAIL_USERNAME: ${{ secrets.JOB_ALERT_EMAIL_USERNAME }}
-          JOB_ALERT_EMAIL_PASSWORD: ${{ secrets.JOB_ALERT_EMAIL_PASSWORD }}
         run: portfoliofit run-profile-pipeline --config config/profile_pipeline.yaml
 
       - name: Upload profile pipeline outputs
@@ -35,6 +48,7 @@ jobs:
         with:
           name: profile-pipeline-output
           path: |
+            data/job_alert_exports/**
             outputs/job_discovery/profile_pipeline/**
             outputs/applications/profile_pipeline/**
             outputs/applications/application_tracker.csv

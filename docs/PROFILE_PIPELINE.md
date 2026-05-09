@@ -7,7 +7,7 @@ The connected profile pipeline turns PortfolioFit Agent from a single-job pack g
 ```text
 Connected profile config
   -> sync profile and portfolio evidence
-  -> read saved job alerts / job exports
+  -> fetch job-alert emails or read saved job exports
   -> discover roles
   -> filter by fit score and blocked keywords
   -> generate application packs
@@ -32,7 +32,61 @@ outputs/job_discovery/profile_pipeline
 outputs/applications/profile_pipeline
 ```
 
+## No-manual-export workflow
+
+This is the recommended workflow if you do not want to manually export job alerts.
+
+```text
+1. Create job alerts once on LinkedIn, Naukri, Indeed, Monster, or company career pages.
+2. Route those alerts to a mailbox you control.
+3. Add IMAP credentials as GitHub Secrets.
+4. Run Profile Pipeline with fetch_email_alerts=true.
+5. Download profile-pipeline-output.
+```
+
+Required GitHub Secrets:
+
+```text
+JOB_ALERT_IMAP_HOST       example: imap.gmail.com
+JOB_ALERT_IMAP_USERNAME   mailbox username
+JOB_ALERT_IMAP_PASSWORD   app password / mailbox password
+```
+
+Optional GitHub Secrets:
+
+```text
+JOB_ALERT_IMAP_MAILBOX    default: INBOX
+JOB_ALERT_IMAP_QUERY      default: (OR SUBJECT "job alert" SUBJECT "jobs")
+```
+
+For Gmail, use an app password. Do not use your normal Gmail password.
+
+Manual run path:
+
+```text
+Actions -> Profile Pipeline -> Run workflow -> fetch_email_alerts=true
+```
+
+The workflow fetches matching emails into:
+
+```text
+data/job_alert_exports/
+```
+
+Then the saved-alert discovery config picks them up automatically.
+
 ## Run locally
+
+Fetch job-alert emails locally:
+
+```bash
+export JOB_ALERT_IMAP_HOST=imap.gmail.com
+export JOB_ALERT_IMAP_USERNAME=your_alert_mailbox@gmail.com
+export JOB_ALERT_IMAP_PASSWORD=your_app_password
+portfoliofit fetch-job-alert-emails --output data/job_alert_exports --limit 50
+```
+
+Run the pipeline:
 
 ```bash
 portfoliofit run-profile-pipeline --config config/profile_pipeline.yaml
@@ -92,14 +146,9 @@ Generated repo evidence is written separately for review. Do not blindly merge i
 
 ### LinkedIn / Naukri / Indeed / Monster
 
-Use saved exports, not aggressive scraping.
+Preferred method: job alerts through email. This avoids brittle scraping and account-risk behavior.
 
-```text
-1. Create job alerts on the platform.
-2. Save/export the alert email, job page, or listing as .html, .txt, or .eml.
-3. Drop it into data/job_alert_exports/.
-4. Run the pipeline.
-```
+Fallback method: save/export the alert email, job page, or listing as `.html`, `.txt`, or `.eml`.
 
 The saved-alert config automatically picks up:
 

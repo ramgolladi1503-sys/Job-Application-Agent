@@ -88,6 +88,33 @@ def test_saved_alert_glob_discovery(tmp_path):
     assert "QA Automation Engineer" in titles
 
 
+def test_eml_job_alert_discovery(tmp_path):
+    eml = tmp_path / "alert.eml"
+    eml.write_text(
+        "Subject: LinkedIn Job Alert - GenAI QA Engineer\n"
+        "From: jobs@example.com\n"
+        "Content-Type: text/plain; charset=utf-8\n"
+        "\n"
+        "Role: GenAI QA Engineer\n"
+        "Company: Email AI Labs\n"
+        "Location: Remote\n"
+        "Need LLM Evaluation, Prompt Testing, AI Testing, API Testing, and model validation.\n",
+        encoding="utf-8",
+    )
+    config = tmp_path / "sources.yaml"
+    config.write_text(
+        "sources:\n"
+        "  - name: eml_alerts\n"
+        "    type: glob\n"
+        "    enabled: true\n"
+        f"    pattern: {tmp_path.as_posix()}/*.eml\n",
+        encoding="utf-8",
+    )
+    leads = discover_jobs_from_config(config, tmp_path / "discovery", limit=10)
+    assert any(lead.title == "GenAI QA Engineer" for lead in leads)
+    assert any(lead.company == "Email AI Labs" for lead in leads)
+
+
 def test_profile_pipeline_generates_next_actions(tmp_path):
     alert_file = tmp_path / "alert.html"
     alert_file.write_text(

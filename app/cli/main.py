@@ -9,6 +9,7 @@ from rich.console import Console
 
 from app.core.application_tracker import export_tracker, render_tracker_summary, update_application_status
 from app.core.ats_scorer import render_ats_report, score_resume_ats
+from app.core.email_job_ingestion import fetch_job_alert_emails_from_env
 from app.core.evidence_matcher import map_evidence
 from app.core.fit_scorer import score_job
 from app.core.generators import render_resume, write_application_pack
@@ -37,6 +38,18 @@ def init_profile(output: Path = typer.Option(Path("profile"), help="Directory fo
         destination = output / source.name.replace(".example", "")
         shutil.copyfile(source, destination)
         console.print(f"Created {destination}")
+
+
+@app.command(name="fetch-job-alert-emails")
+def fetch_job_alert_emails_command(
+    output: Path = typer.Option(Path("data/job_alert_exports"), help="Folder to write fetched alert text files."),
+    limit: int = typer.Option(25, help="Maximum number of matching emails to fetch."),
+) -> None:
+    """Fetch job-alert emails through IMAP using JOB_ALERT_IMAP_* environment variables."""
+    paths = fetch_job_alert_emails_from_env(output, limit=limit)
+    console.print(f"[bold green]Fetched {len(paths)} job-alert email(s).[/bold green]")
+    for path in paths:
+        console.print(f"- {path}")
 
 
 @app.command(name="run-profile-pipeline")

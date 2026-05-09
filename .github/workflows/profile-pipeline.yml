@@ -26,6 +26,8 @@ jobs:
       - name: Run connected profile pipeline
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          JOB_ALERT_EMAIL_USERNAME: ${{ secrets.JOB_ALERT_EMAIL_USERNAME }}
+          JOB_ALERT_EMAIL_PASSWORD: ${{ secrets.JOB_ALERT_EMAIL_PASSWORD }}
         run: portfoliofit run-profile-pipeline --config config/profile_pipeline.yaml
 
       - name: Upload profile pipeline outputs
